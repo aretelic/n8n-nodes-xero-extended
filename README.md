@@ -18,7 +18,8 @@ Xero Extended is an enhanced Xero integration that extends the standard Xero nod
 - [Resources](#resources)
 - [Setup after installation](#setup-after-installation)
 - [License](#license)
-- [Support](#support)  
+- [Support](#support)
+- [Acknowledgments](#acknowledgments)  
 
 ## Installation
 
@@ -201,6 +202,23 @@ Now the following are requested in addition: 	'accounting.attachments',	'account
 ## Support
 
 For support, please open an issue on the [GitHub repository](https://github.com/Mad-Man-Dan/n8n-nodes-xero-extended).
+
+## Acknowledgments
+
+This node is built upon the official n8n Xero node. Special thanks to:
+
+- **n8n team** - For the original Xero node implementation
+- **Xero API team** - For providing the excellent API
+- **n8n community** - For the supportive ecosystem
+
+### Original Work Attribution
+
+This project extends the functionality of the official n8n Xero node, which is part of the n8n core project. The original Xero node is licensed under the MIT License and is maintained by the n8n team.
+
+- Original Xero node: [n8n-nodes-base.xero](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.xero/)
+- n8n project: [https://n8n.io](https://n8n.io)
+
+For detailed attribution information, see [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md).
 
 ## Author
 

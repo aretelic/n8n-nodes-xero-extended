@@ -1,3 +1,11 @@
+/**
+ * Xero+ OAuth2 Credentials for n8n
+ * 
+ * This credential extends the functionality of the official n8n Xero credentials
+ * Original Xero credentials: https://github.com/n8n-io/n8n/tree/master/packages/nodes-base/credentials/XeroOAuth2Api.credentials.ts
+ * 
+ */
+
 import type { ICredentialType, INodeProperties } from 'n8n-workflow';
 
 const scopes = [
