@@ -5,9 +5,66 @@
 
 An enhanced Xero integration for n8n that extends the standard Xero node with additional resources and improved functionality.
 
-## Features
+Xero Plus is an enhanced Xero integration that extends the standard Xero node with additional resources and improved functionality, including enhanced search capabilities, summary modes, and quality-of-life improvements.
+
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Resources](#resources)  
+[Support](#support)  
+
+## Installation
+
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+
+**Note:** This node is currently only available for self-hosted n8n instances. It will be available for n8n Cloud users in the future via pull requests to the base Xero node.
+
+## Operations
 
 This node provides enhanced functionality for Xero integration, including additional resources and quality-of-life improvements that go beyond the standard Xero node.
+
+### Available Operations
+
+- **Contacts**: Get, Get Many, Create, Update, Delete
+- **Invoices**: Get, Get Many, Create, Update, Delete
+- **Organisations**: Get Connected Organisations, Get Organisation Details
+- **Attachments**: Upload, Get, Get Many
+- **Accounts**: Create, Get, Get Many, Update, Delete
+- **Reports**: Get 1099 Report, Get Balance Sheet Report, Get Budget Summary Report, Get Profit and Loss Report
+- **Bank Transactions**: Create, Get, Get Many
+- **Bank Transfers**: Create, Get, Get Many
+- **Manual Journals**: Create, Get, Get Many
+- **History and Notes**: Create Note, Get History
+
+## Credentials
+
+This node uses Xero OAuth2 credentials that are separate from the standard Xero node. The credentials request additional scopes not included in the original Xero base node.
+
+### Required Scopes
+
+**Base scopes:**
+- `offline_access`
+- `accounting.transactions`
+- `accounting.settings`
+- `accounting.contacts`
+
+**Additional scopes:**
+- `accounting.attachments`
+- `accounting.budgets.read`
+- `files`
+- `accounting.reports.read`
+
+### Setup
+
+1. Create a new Xero OAuth2 credential (cannot use the base Xero node credentials)
+2. Select the resource/organizations you want to work with or accept all
+
+## Compatibility
+
+This node is compatible with n8n versions that support community nodes. Tested with recent n8n versions.
 
 ## Resources
 
@@ -81,13 +138,19 @@ Complete bank transaction management:
 - **Get Bank Transactions** - Retrieve transaction history
 - **Get Many Transactions** - Retrieve multiple transactions with filtering
 
-
 ### 💸 Bank Transfers
 Manage bank transfers between accounts:
 
 - **Create Bank Transfer** - Create transfers between bank accounts
 - **Get Bank Transfers** - Retrieve transfer history
-- **Get Many Transactions** - Retrieve multiple tratransfers with filtering
+- **Get Many Transactions** - Retrieve multiple transfers with filtering
+
+### Manual Journals
+Manage manual journal entries:
+
+- **Create Manual Journal** - Create new manual journal entries
+- **Get Manual Journal** - Retrieve specific manual journal details
+- **Get Many Manual Journals** - Retrieve multiple manual journals with filtering
 
 ### 📝 History and Notes
 Track changes and manage notes:
