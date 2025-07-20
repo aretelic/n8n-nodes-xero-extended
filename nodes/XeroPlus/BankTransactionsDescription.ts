@@ -30,14 +30,6 @@ export const banktransactionsOperations: INodeProperties[] = [
 				description: 'Get many bank transactions',
 				action: 'Get many bank transactions',
 			},
-            /*
-			{
-				name: 'Delete',
-				value: 'delete',
-				description: 'Delete a bank transaction',
-				action: 'Delete a bank transaction',
-			},
-            */
 		],
 		default: 'create',
 	},
@@ -760,7 +752,7 @@ export const banktransactionsFields: INodeProperties[] = [
 																				default: 'SPEND',
 																				description: 'Transaction type to filter by',
 																			},
-																			],
+					    ],
                     },
                 ],
             },

@@ -25,6 +25,8 @@ import { reportFields, reportOperations } from './ReportDescription';
 import { banktransactionsFields, banktransactionsOperations } from './BankTransactionsDescription';
 import { banktransferFields, banktransferOperations } from './BankTransfers';
 import { historyandnotesFields, historyandnotesOperations } from './HistoryandNotesDescription';
+import { manualjournalsFields, manualjournalsOperations } from './ManualJournalsDescription';
+
 
 
 export class Xeroplus implements INodeType {
@@ -84,6 +86,10 @@ export class Xeroplus implements INodeType {
 						value: 'invoice',
 					},
 					{
+						name: 'Manual Journal',
+						value: 'manualjournals',
+					},
+					{
 						name: 'Organisation',
 						value: 'organisation',
 					},
@@ -121,6 +127,9 @@ export class Xeroplus implements INodeType {
 			// HISTORY AND NOTES
 			...historyandnotesOperations,
 			...historyandnotesFields,
+			// MANUAL JOURNALS
+			...manualjournalsOperations,
+			...manualjournalsFields,
 		],
 	};
 
@@ -2025,6 +2034,172 @@ export class Xeroplus implements INodeType {
 							{ organizationId },
 						);
 						responseData = responseData.HistoryRecords;
+					}
+				}
+
+				// MANUAL JOURNALS
+				if (resource === 'manualjournals') {
+					// Create
+					if (operation === 'create') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const narration = this.getNodeParameter('narration', i) as string;
+						const journalLinesInputMethod = this.getNodeParameter('journalLinesInputMethod', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						let journalLines: IDataObject[] = [];
+
+						if (journalLinesInputMethod === 'ui') {
+							const journalLinesUi = this.getNodeParameter('journalLinesUi', i) as IDataObject;
+							if (journalLinesUi.journalLinesValues) {
+								const journalLinesValues = journalLinesUi.journalLinesValues as IDataObject[];
+								for (const line of journalLinesValues) {
+									const journalLine: IDataObject = {
+										AccountCode: line.accountCode,
+										LineAmount: parseFloat(line.lineAmount as string),
+									};
+
+									if (line.description) {
+										journalLine.Description = line.description;
+									}
+
+									if (line.taxType) {
+										journalLine.TaxType = line.taxType;
+									}
+
+									if (line.trackingUi) {
+										const trackingUi = line.trackingUi as IDataObject;
+										if (trackingUi.trackingValues) {
+											const trackingValues = trackingUi.trackingValues as IDataObject[];
+											journalLine.Tracking = trackingValues.map((tracking: IDataObject) => ({
+												Name: tracking.name,
+												Option: tracking.option,
+											}));
+										}
+									}
+
+									journalLines.push(journalLine);
+								}
+							}
+						} else {
+							journalLines = this.getNodeParameter('journalLinesJson', i) as IDataObject[];
+						}
+
+						if (journalLines.length < 2) {
+							throw new NodeOperationError(this.getNode(), 'Manual journal must have at least 2 journal lines');
+						}
+
+						const body: IDataObject = {
+							organizationId,
+							Narration: narration,
+							JournalLines: journalLines,
+						};
+
+						if (additionalFields.date) {
+							const date = new Date(additionalFields.date as string);
+							body.Date = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+						}
+
+						if (additionalFields.lineAmountTypes) {
+							body.LineAmountTypes = additionalFields.lineAmountTypes;
+						}
+
+						if (additionalFields.status) {
+							body.Status = additionalFields.status;
+						}
+
+						if (additionalFields.url) {
+							body.Url = additionalFields.url;
+						}
+
+						if (additionalFields.showOnCashBasisReports !== undefined) {
+							body.ShowOnCashBasisReports = additionalFields.showOnCashBasisReports;
+						}
+
+						responseData = await xeroApiRequest.call(this, 'POST', '/ManualJournals', body);
+						responseData = responseData.ManualJournals;
+					}
+					// Get
+					if (operation === 'get') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const manualJournalId = this.getNodeParameter('manualJournalId', i) as string;
+						responseData = await xeroApiRequest.call(this, 'GET', `/ManualJournals/${manualJournalId}`, { organizationId });
+						responseData = responseData.ManualJournals;
+					}
+					// Get All
+					if (operation === 'getAll') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const options = this.getNodeParameter('options', i) as IDataObject;
+						const headers: IDataObject = {};
+
+						if (options.orderBy) {
+							qs.order = `${options.orderBy} ${options.sortOrder ?? 'ASC'}`;
+						}
+
+						// Where clause handling
+						let whereClause = '';
+						
+						// Use custom where if provided, otherwise build from filters
+						if (options.customWhere) {
+							whereClause = options.customWhere as string;
+						} else if (options.whereFilters) {
+							const filters = (options.whereFilters as IDataObject).filters as IDataObject[];
+							if (filters && filters.length > 0) {
+								const whereParts: string[] = [];
+								for (const filter of filters) {
+									const field = filter.field as string;
+									
+									switch (field) {
+										case 'DateRange':
+											if (filter.dateFromValue || filter.dateToValue) {
+												const dateParts: string[] = [];
+												if (filter.dateFromValue) {
+													const fromDate = new Date(filter.dateFromValue as string);
+													dateParts.push(`Date>=DateTime(${fromDate.getFullYear()}, ${String(fromDate.getMonth() + 1).padStart(2, '0')}, ${String(fromDate.getDate()).padStart(2, '0')})`);
+												}
+												if (filter.dateToValue) {
+													const toDate = new Date(filter.dateToValue as string);
+													dateParts.push(`Date<=DateTime(${toDate.getFullYear()}, ${String(toDate.getMonth() + 1).padStart(2, '0')}, ${String(toDate.getDate()).padStart(2, '0')})`);
+												}
+												if (dateParts.length > 0) {
+													whereParts.push(dateParts.join(' && '));
+												}
+											}
+											break;
+										case 'Narration':
+											if (filter.narrationValue) {
+												whereParts.push(`Narration=="${filter.narrationValue}"`);
+											}
+											break;
+										case 'Status':
+											if (filter.statusValue) {
+												whereParts.push(`Status=="${filter.statusValue}"`);
+											}
+											break;
+									}
+								}
+								whereClause = whereParts.join(' && ');
+							}
+						}
+						
+						if (whereClause) {
+							qs.where = whereClause;
+						}
+
+						// Handle If-Modified-Since header
+						if (options['If-Modified-Since']) {
+							headers['If-Modified-Since'] = options['If-Modified-Since'] as string;
+						}
+
+						responseData = await xeroApiRequest.call(
+							this,
+							'GET',
+							'/ManualJournals',
+							{ organizationId },
+							qs,
+							undefined,
+							headers,
+						);
+						responseData = responseData.ManualJournals;
 					}
 				}
 
