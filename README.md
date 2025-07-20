@@ -7,6 +7,8 @@ An enhanced Xero integration for n8n that extends the standard Xero node with ad
 
 Xero Plus is an enhanced Xero integration that extends the standard Xero node with additional resources and improved functionality, including enhanced search capabilities, summary modes, and quality-of-life improvements.
 
+![Xero Plus Action Comparison](Screenshot_Xero_action_comparison.png)
+
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
 [Installation](#installation)  
