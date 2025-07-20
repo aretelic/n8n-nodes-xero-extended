@@ -333,76 +333,13 @@ export const accountsFields: INodeProperties[] = [
 					{
 						name: 'filters',
 						displayName: 'Filter',
+						// eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
 						values: [
 							{
-						displayName: 'Accounts on Watchlist',
-						name: 'AddToWatchlist',
-						type: 'boolean',
-						default: false,
-							},
-							{
-						displayName: 'Bank Account Type',
-						name: 'bankAccountTypeValue',
-						type: 'options',
-						options: [
-									{
-										name: 'Bank',
-										value: 'BANK',
-									},
-									{
-										name: 'Credit Card',
-										value: 'CREDITCARD',
-									},
-									{
-										name: 'PayPal',
-										value: 'PAYPAL',
-									},
-									{
-										name: 'Other',
-										value: 'OTHER',
-									},
-								],
-						default: 'BANK',
-							},
-							{
-						displayName: 'Class',
-						name: 'classValue',
-						type: 'options',
-						options: [
-									{
-										name: 'Asset',
-										value: 'ASSET',
-									},
-									{
-										name: 'Equity',
-										value: 'EQUITY',
-									},
-									{
-										name: 'Expense',
-										value: 'EXPENSE',
-									},
-									{
-										name: 'Liability',
-										value: 'LIABILITY',
-									},
-									{
-										name: 'Revenue',
-										value: 'REVENUE',
-									},
-					],
-						default: 'ASSET',
-							},
-							{
-						displayName: 'Enable Payments To Account',
-						name: 'enablePaymentsValue',
-						type: 'boolean',
-						default: false,
-							},
-							{
-						displayName: 'Field',
-						name: 'field',
-						type: 'options',
-						options: [
+								displayName: 'Field',
+								name: 'field',
+								type: 'options',
+								options: [
 									{
 										name: 'Accounts on Watchlist',
 										value: 'AddToWatchlist',
@@ -435,15 +372,103 @@ export const accountsFields: INodeProperties[] = [
 										name: 'Type',
 										value: 'Type',
 									},
-					],
-						default: 'Type',
-						description: 'Field to filter on',
+								],
+								default: 'Type',
+								description: 'Field to filter on',
+							},							
+							{
+								displayName: 'Accounts on Watchlist',
+								name: 'AddToWatchlist',
+								type: 'boolean',
+								default: false,
+								description: 'Whether to filter accounts that are on watchlist',
+								displayOptions: {
+									show: {
+										field: ['AddToWatchlist'],
+									},
+								},
 							},
 							{
-						displayName: 'Status',
-						name: 'statusValue',
-						type: 'options',
-						options: [
+								displayName: 'Bank Account Type',
+								name: 'bankAccountTypeValue',
+								type: 'options',
+								options: [
+									{
+										name: 'Bank',
+										value: 'BANK',
+									},
+									{
+										name: 'Credit Card',
+										value: 'CREDITCARD',
+									},
+									{
+										name: 'PayPal',
+										value: 'PAYPAL',
+									},
+									{
+										name: 'Other',
+										value: 'OTHER',
+									},
+								],
+								default: 'BANK',
+								description: 'Bank account type to filter by',
+								displayOptions: {
+									show: {
+										field: ['BankAccountType'],
+									},
+								},
+							},
+							{
+								displayName: 'Class',
+								name: 'classValue',
+								type: 'options',
+								options: [
+									{
+										name: 'Asset',
+										value: 'ASSET',
+									},
+									{
+										name: 'Equity',
+										value: 'EQUITY',
+									},
+									{
+										name: 'Expense',
+										value: 'EXPENSE',
+									},
+									{
+										name: 'Liability',
+										value: 'LIABILITY',
+									},
+									{
+										name: 'Revenue',
+										value: 'REVENUE',
+									},
+								],
+								default: 'ASSET',
+								description: 'Account class to filter by',
+								displayOptions: {
+									show: {
+										field: ['Class'],
+									},
+								},
+							},
+							{
+								displayName: 'Enable Payments To Account',
+								name: 'enablePaymentsValue',
+								type: 'boolean',
+								default: false,
+								description: 'Whether to filter accounts that have payments enabled',
+								displayOptions: {
+									show: {
+										field: ['EnablePaymentsToAccount'],
+									},
+								},
+							},
+							{
+								displayName: 'Status',
+								name: 'statusValue',
+								type: 'options',
+								options: [
 									{
 										name: 'Active',
 										value: 'ACTIVE',
@@ -452,14 +477,20 @@ export const accountsFields: INodeProperties[] = [
 										name: 'Archived',
 										value: 'ARCHIVED',
 									},
-					],
-						default: 'ACTIVE',
+								],
+								default: 'ACTIVE',
+								description: 'Account status to filter by',
+								displayOptions: {
+									show: {
+										field: ['Status'],
+									},
+								},
 							},
 							{
-						displayName: 'System Account',
-						name: 'systemAccountValue',
-						type: 'options',
-						options: [
+								displayName: 'System Account',
+								name: 'systemAccountValue',
+								type: 'options',
+								options: [
 									{
 										name: 'Accounts Payable',
 										value: 'CREDITORS',
@@ -493,7 +524,7 @@ export const accountsFields: INodeProperties[] = [
 										value: 'CISMATERIALS',
 									},
 									{
-										name: 'GST	/	VAT',
+										name: 'GST / VAT',
 										value: 'GST',
 									},
 									{
@@ -532,22 +563,33 @@ export const accountsFields: INodeProperties[] = [
 										name: 'Wages Payable',
 										value: 'WAGEPAYABLES',
 									},
-					],
-						default: 'DEBTORS',
+								],
+								default: 'DEBTORS',
+								description: 'System account type to filter by',
+								displayOptions: {
+									show: {
+										field: ['SystemAccount'],
+									},
+								},
 							},
 							{
-						displayName: 'Tax Type',
-						name: 'taxTypeValue',
-						type: 'string',
-						default: '',
-						placeholder: 'INPUT, OUTPUT, NONE, etc.',
-						description: 'Tax type code',
+								displayName: 'Tax Type',
+								name: 'taxTypeValue',
+								type: 'string',
+								default: '',
+								placeholder: 'INPUT, OUTPUT, NONE, etc.',
+								description: 'Tax type code to filter by',
+								displayOptions: {
+									show: {
+										field: ['TaxType'],
+									},
+								},
 							},
 							{
-						displayName: 'Type',
-						name: 'typeValue',
-						type: 'options',
-						options: [
+								displayName: 'Type',
+								name: 'typeValue',
+								type: 'options',
+								options: [
 									{
 										name: 'Bank',
 										value: 'BANK',
@@ -616,10 +658,16 @@ export const accountsFields: INodeProperties[] = [
 										name: 'Term Liability',
 										value: 'TERMLIAB',
 									},
-					],
-						default: 'BANK',
+								],
+								default: 'BANK',
+								description: 'Account type to filter by',
+								displayOptions: {
+									show: {
+										field: ['Type'],
+									},
+								},
 							},
-					],
+						],
 					},
 				],
 			},

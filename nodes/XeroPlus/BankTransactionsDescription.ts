@@ -582,177 +582,246 @@ export const banktransactionsFields: INodeProperties[] = [
                     {
                         name: 'filters',
                         displayName: 'Filter',
+                        // eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
                         values: [
-																			{
-																				displayName: 'Bank Account Code',
-																				name: 'bankAccountCodeValue',
-																				type: 'string',
-																				default: '',
-																				description: 'Bank account code to filter by',
-																			},
-																			{
-																				displayName: 'Bank Account ID',
-																				name: 'bankAccountIdValue',
-																				type: 'options',
-																				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-																				default: '',
-																			},
-																			{
-																				displayName: 'Contact ID',
-																				name: 'contactIdValue',
-																				type: 'options',
-																				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-																				default: '',
-																			},
-																			{
-																				displayName: 'Contact Name',
-																				name: 'contactNameValue',
-																				type: 'string',
-																				default: '',
-																				description: 'Contact name to filter by',
-																			},
-																			{
-																				displayName: 'Date From',
-																				name: 'dateFromValue',
-																				type: 'dateTime',
-																				default: '',
-																				description: 'Filter transactions from this date',
-																			},
-																			{
-																				displayName: 'Date To',
-																				name: 'dateToValue',
-																				type: 'dateTime',
-																				default: '',
-																				description: 'Filter transactions to this date',
-																			},
-																			{
-																				displayName: 'Field',
-																				name: 'field',
-																				type: 'options',
-																				options: [
-																							{
-																								name: 'Bank Account Code',
-																								value: 'BankAccount.Code',
-																							},
-																							{
-																								name: 'Bank Account ID',
-																								value: 'BankAccount.AccountID',
-																							},
-																							{
-																								name: 'Contact ID',
-																								value: 'Contact.ContactID',
-																							},
-																							{
-																								name: 'Contact Name',
-																								value: 'Contact.Name',
-																							},
-																							{
-																								name: 'Date Range',
-																								value: 'DateRange',
-																							},
-																							{
-																								name: 'Is Reconciled',
-																								value: 'IsReconciled',
-																							},
-																							{
-																								name: 'Reference',
-																								value: 'Reference',
-																							},
-																							{
-																								name: 'Status',
-																								value: 'Status',
-																							},
-																							{
-																								name: 'Total Range',
-																								value: 'TotalRange',
-																							},
-																							{
-																								name: 'Type',
-																								value: 'Type',
-																							},
-																						],
-																				default: 'Type',
-																				description: 'Field to filter on',
-																			},
-																			{
-																				displayName: 'Is Reconciled',
-																				name: 'isReconciledValue',
-																				type: 'boolean',
-																				default: false,
-																				description: 'Whether to filter by reconciliation status',
-																			},
-																			{
-																				displayName: 'Reference',
-																				name: 'referenceValue',
-																				type: 'string',
-																				default: '',
-																				description: 'Reference to filter by',
-																			},
-																			{
-																				displayName: 'Status',
-																				name: 'statusValue',
-																				type: 'options',
-																				options: [
-																							{
-																								name: 'Authorised',
-																								value: 'AUTHORISED',
-																							},
-																							{
-																								name: 'Deleted',
-																								value: 'DELETED',
-																							},
-																					],
-																				default: 'AUTHORISED',
-																				description: 'Status to filter by',
-																			},
-																			{
-																				displayName: 'Total Maximum',
-																				name: 'totalMaxValue',
-																				type: 'number',
-																				default: '',
-																				description: 'Filter transactions with total less than or equal to this amount',
-																			},
-																			{
-																				displayName: 'Total Minimum',
-																				name: 'totalMinValue',
-																				type: 'number',
-																				default: '',
-																				description: 'Filter transactions with total greater than or equal to this amount',
-																			},
-																			{
-																				displayName: 'Type',
-																				name: 'typeValue',
-																				type: 'options',
-																				options: [
-																							{
-																								name: 'Receive Money',
-																								value: 'RECEIVE',
-																							},
-																							{
-																								name: 'Receive Overpayment',
-																								value: 'RECEIVE-OVERPAYMENT',
-																							},
-																							{
-																								name: 'Receive Prepayment',
-																								value: 'RECEIVE-PREPAYMENT',
-																							},
-																							{
-																								name: 'Spend Money',
-																								value: 'SPEND',
-																							},
-																							{
-																								name: 'Spend Overpayment',
-																								value: 'SPEND-OVERPAYMENT',
-																							},
-																							{
-																								name: 'Spend Prepayment',
-																								value: 'SPEND-PREPAYMENT',
-																							},
-																					],
-																				default: 'SPEND',
-																				description: 'Transaction type to filter by',
-																			},
-					    ],
+                            {
+                                displayName: 'Field',
+                                name: 'field',
+                                type: 'options',
+                                options: [
+                                    {
+                                        name: 'Bank Account Code',
+                                        value: 'BankAccount.Code',
+                                    },
+                                    {
+                                        name: 'Bank Account ID',
+                                        value: 'BankAccount.AccountID',
+                                    },
+                                    {
+                                        name: 'Contact ID',
+                                        value: 'Contact.ContactID',
+                                    },
+                                    {
+                                        name: 'Contact Name',
+                                        value: 'Contact.Name',
+                                    },
+                                    {
+                                        name: 'Date Range',
+                                        value: 'DateRange',
+                                    },
+                                    {
+                                        name: 'Is Reconciled',
+                                        value: 'IsReconciled',
+                                    },
+                                    {
+                                        name: 'Reference',
+                                        value: 'Reference',
+                                    },
+                                    {
+                                        name: 'Status',
+                                        value: 'Status',
+                                    },
+                                    {
+                                        name: 'Total Range',
+                                        value: 'TotalRange',
+                                    },
+                                    {
+                                        name: 'Type',
+                                        value: 'Type',
+                                    },
+                                ],
+                                default: 'Type',
+                                description: 'Field to filter on',
+                            },
+                            {
+                                displayName: 'Bank Account Code',
+                                name: 'bankAccountCodeValue',
+                                type: 'string',
+                                default: '',
+                                description: 'Bank account code to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['BankAccount.Code'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Bank Account Name or ID',
+                                name: 'bankAccountIdValue',
+                                type: 'options',
+                                description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+                                typeOptions: {
+                                    loadOptionsMethod: 'getBankAccounts',
+                                    loadOptionsDependsOn: ['/organizationId'],
+                                },
+                                default: '',
+                                displayOptions: {
+                                    show: {
+                                        field: ['BankAccount.AccountID'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Contact Name or ID',
+                                name: 'contactIdValue',
+                                type: 'options',
+                                description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+                                typeOptions: {
+                                    loadOptionsMethod: 'getContacts',
+                                    loadOptionsDependsOn: ['/organizationId'],
+                                },
+                                default: '',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Contact.ContactID'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Contact Name',
+                                name: 'contactNameValue',
+                                type: 'string',
+                                default: '',
+                                description: 'Contact name to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Contact.Name'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Date From',
+                                name: 'dateFromValue',
+                                type: 'dateTime',
+                                default: '',
+                                description: 'Filter transactions from this date',
+                                displayOptions: {
+                                    show: {
+                                        field: ['DateRange'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Date To',
+                                name: 'dateToValue',
+                                type: 'dateTime',
+                                default: '',
+                                description: 'Filter transactions to this date',
+                                displayOptions: {
+                                    show: {
+                                        field: ['DateRange'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Is Reconciled',
+                                name: 'isReconciledValue',
+                                type: 'boolean',
+                                default: false,
+                                description: 'Whether to filter by reconciliation status',
+                                displayOptions: {
+                                    show: {
+                                        field: ['IsReconciled'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Reference',
+                                name: 'referenceValue',
+                                type: 'string',
+                                default: '',
+                                description: 'Reference to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Reference'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Status',
+                                name: 'statusValue',
+                                type: 'options',
+                                options: [
+                                    {
+                                        name: 'Authorised',
+                                        value: 'AUTHORISED',
+                                    },
+                                    {
+                                        name: 'Deleted',
+                                        value: 'DELETED',
+                                    },
+                                ],
+                                default: 'AUTHORISED',
+                                description: 'Status to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Status'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Total Maximum',
+                                name: 'totalMaxValue',
+                                type: 'number',
+                                default: '',
+                                description: 'Filter transactions with total less than or equal to this amount',
+                                displayOptions: {
+                                    show: {
+                                        field: ['TotalRange'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Total Minimum',
+                                name: 'totalMinValue',
+                                type: 'number',
+                                default: '',
+                                description: 'Filter transactions with total greater than or equal to this amount',
+                                displayOptions: {
+                                    show: {
+                                        field: ['TotalRange'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Type',
+                                name: 'typeValue',
+                                type: 'options',
+                                options: [
+                                    {
+                                        name: 'Receive Money',
+                                        value: 'RECEIVE',
+                                    },
+                                    {
+                                        name: 'Receive Overpayment',
+                                        value: 'RECEIVE-OVERPAYMENT',
+                                    },
+                                    {
+                                        name: 'Receive Prepayment',
+                                        value: 'RECEIVE-PREPAYMENT',
+                                    },
+                                    {
+                                        name: 'Spend Money',
+                                        value: 'SPEND',
+                                    },
+                                    {
+                                        name: 'Spend Overpayment',
+                                        value: 'SPEND-OVERPAYMENT',
+                                    },
+                                    {
+                                        name: 'Spend Prepayment',
+                                        value: 'SPEND-PREPAYMENT',
+                                    },
+                                ],
+                                default: 'SPEND',
+                                description: 'Transaction type to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Type'],
+                                    },
+                                },
+                            },
+                        ],
                     },
                 ],
             },

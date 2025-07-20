@@ -438,6 +438,14 @@ export const contactFields: INodeProperties[] = [
 		},
 		options: [
 			{
+				displayName: 'Custom Where Clause',
+				name: 'customWhere',
+				type: 'string',
+				default: '',
+				description: 'Custom WHERE clause for advanced filtering (e.g., "Name==\\"ABC Limited\\" && EmailAddress==\\"email@example.com\\"")',
+				placeholder: 'Name=="ABC Limited" && EmailAddress=="email@example.com"',
+			},
+			{
 				displayName: 'Include Archived',
 				name: 'includeArchived',
 				type: 'boolean',
@@ -492,6 +500,74 @@ export const contactFields: INodeProperties[] = [
 				default: '',
 				description:
 					'The where parameter allows you to filter on endpoints and elements that don\'t have explicit parameters. <a href="https://developer.xero.com/documentation/api/requests-and-responses#get-modified">Examples Here</a>.',
+			},
+			{
+				displayName: 'Where Filters',
+				name: 'whereFilters',
+				placeholder: 'Add Filter',
+				type: 'fixedCollection',
+				default: {},
+				typeOptions: {
+					multipleValues: true,
+				},
+				description: 'Structured filters for common use cases (optimized fields)',
+				options: [
+					{
+						name: 'filters',
+						displayName: 'Filter',
+						// eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
+						values: [
+							{
+								displayName: 'Field',
+								name: 'field',
+								type: 'options',
+								options: [
+									{ name: 'Account Number', value: 'AccountNumber' },
+									{ name: 'Email Address', value: 'EmailAddress' },
+									{ name: 'Name', value: 'Name' },
+								],
+								default: 'Name',
+								description: 'Field to filter on',
+							},
+							{
+								displayName: 'Account Number',
+								name: 'accountNumberValue',
+								type: 'string',
+								default: '',
+								description: 'Account number to filter by',
+								displayOptions: {
+									show: {
+										field: ['AccountNumber'],
+									},
+								},
+							},
+							{
+								displayName: 'Email Address',
+								name: 'emailAddressValue',
+								type: 'string',
+								default: '',
+								description: 'Email address to filter by',
+								displayOptions: {
+									show: {
+										field: ['EmailAddress'],
+									},
+								},
+							},
+							{
+								displayName: 'Name',
+								name: 'nameValue',
+								type: 'string',
+								default: '',
+								description: 'Contact name to filter by',
+								displayOptions: {
+									show: {
+										field: ['Name'],
+									},
+								},
+							},
+						],
+					},
+				],
 			},
 		],
 	},

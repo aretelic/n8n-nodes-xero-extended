@@ -274,63 +274,8 @@ export const banktransferFields: INodeProperties[] = [
                     {
                         name: 'filters',
                         displayName: 'Filter',
+                        // eslint-disable-next-line n8n-nodes-base/node-param-fixed-collection-type-unsorted-items
                         values: [
-                            {
-                                displayName: 'Amount Range',
-                                name: 'amountRange',
-                                type: 'fixedCollection',
-                                default: {},
-                                placeholder: 'Add Amount Range',
-                                description: 'Filter by amount range',
-                                options: [
-                                    {
-                                        name: 'amountRangeValues',
-                                        displayName: 'Amount Range',
-                                        values: [
-                                            {
-                                                displayName: 'Minimum Amount',
-                                                name: 'amountMin',
-                                                type: 'number',
-                                                default: 0,
-                                            },
-                                            {
-                                                displayName: 'Maximum Amount',
-                                                name: 'amountMax',
-                                                type: 'number',
-                                                default: 0,
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                            {
-                                displayName: 'Date Range',
-                                name: 'dateRange',
-                                type: 'fixedCollection',
-                                default: {},
-                                placeholder: 'Add Date Range',
-                                description: 'Filter by date range',
-                                options: [
-                                    {
-                                        name: 'dateRangeValues',
-                                        displayName: 'Date Range',
-                                        values: [
-                                            {
-                                                displayName: 'From Date',
-                                                name: 'dateFrom',
-                                                type: 'dateTime',
-                                                default: '',
-                                            },
-                                            {
-                                                displayName: 'To Date',
-                                                name: 'dateTo',
-                                                type: 'dateTime',
-                                                default: '',
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
                             {
                                 displayName: 'Field',
                                 name: 'field',
@@ -373,12 +318,68 @@ export const banktransferFields: INodeProperties[] = [
                                 description: 'Field to filter on',
                             },
                             {
-                                displayName: 'From Bank Account',
+                                displayName: 'Minimum Amount',
+                                name: 'amountMinValue',
+                                type: 'number',
+                                default: '',
+                                description: 'Filter transfers with amount greater than or equal to this amount',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Amount'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Maximum Amount',
+                                name: 'amountMaxValue',
+                                type: 'number',
+                                default: '',
+                                description: 'Filter transfers with amount less than or equal to this amount',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Amount'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Date From',
+                                name: 'dateFromValue',
+                                type: 'dateTime',
+                                default: '',
+                                description: 'Filter transfers from this date',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Date'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'Date To',
+                                name: 'dateToValue',
+                                type: 'dateTime',
+                                default: '',
+                                description: 'Filter transfers to this date',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Date'],
+                                    },
+                                },
+                            },
+                            {
+                                displayName: 'From Bank Account Name or ID',
                                 name: 'fromBankAccountNameValue',
                                 type: 'options',
+                                description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+                                typeOptions: {
+                                    loadOptionsMethod: 'getBankAccounts',
+                                    loadOptionsDependsOn: ['/organizationId'],
+                                },
                                 default: '',
-                                placeholder: 'Business Bank Account',
-                                description: 'Source bank account name to filter by. You can use the expression to use the BankAccountID or BankAccountCode.',
+                                displayOptions: {
+                                    show: {
+                                        field: ['FromBankAccount.Name'],
+                                    },
+                                },
                             },
                             {
                                 displayName: 'From Is Reconciled',
@@ -386,6 +387,11 @@ export const banktransferFields: INodeProperties[] = [
                                 type: 'boolean',
                                 default: false,
                                 description: 'Whether to filter by source account reconciliation status',
+                                displayOptions: {
+                                    show: {
+                                        field: ['FromIsReconciled'],
+                                    },
+                                },
                             },
                             {
                                 displayName: 'Has Attachments',
@@ -393,6 +399,11 @@ export const banktransferFields: INodeProperties[] = [
                                 type: 'boolean',
                                 default: false,
                                 description: 'Whether to filter by attachment status',
+                                displayOptions: {
+                                    show: {
+                                        field: ['HasAttachments'],
+                                    },
+                                },
                             },
                             {
                                 displayName: 'Reference',
@@ -401,14 +412,27 @@ export const banktransferFields: INodeProperties[] = [
                                 default: '',
                                 placeholder: 'Transfer reference',
                                 description: 'Reference text to filter by',
+                                displayOptions: {
+                                    show: {
+                                        field: ['Reference'],
+                                    },
+                                },
                             },
                             {
-                                displayName: 'To Bank Account',
+                                displayName: 'To Bank Account Name or ID',
                                 name: 'toBankAccountNameValue',
                                 type: 'options',
+                                description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+                                typeOptions: {
+                                    loadOptionsMethod: 'getBankAccounts',
+                                    loadOptionsDependsOn: ['/organizationId'],
+                                },
                                 default: '',
-                                placeholder: 'Business Savings Account',
-                                description: 'Destination bank account name to filter by. You can use the expression to use the BankAccountID or BankAccountCode.',
+                                displayOptions: {
+                                    show: {
+                                        field: ['ToBankAccount.Name'],
+                                    },
+                                },
                             },
                             {
                                 displayName: 'To Is Reconciled',
@@ -416,6 +440,11 @@ export const banktransferFields: INodeProperties[] = [
                                 type: 'boolean',
                                 default: false,
                                 description: 'Whether to filter by destination account reconciliation status',
+                                displayOptions: {
+                                    show: {
+                                        field: ['ToIsReconciled'],
+                                    },
+                                },
                             },
                         ],
                     },

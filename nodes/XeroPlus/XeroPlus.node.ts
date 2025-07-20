@@ -23,7 +23,7 @@ import { accountsFields, accountsOperations } from './AccountsDescription';
 import { organisationFields, organisationOperations } from './OrganisationsDescription';
 import { reportFields, reportOperations } from './ReportDescription';
 import { banktransactionsFields, banktransactionsOperations } from './BankTransactionsDescription';
-import { banktransferFields, banktransferOperations } from './BankTransfers';
+import { banktransferFields, banktransferOperations } from './BankTransfersDescription';
 import { historyandnotesFields, historyandnotesOperations } from './HistoryandNotesDescription';
 import { manualjournalsFields, manualjournalsOperations } from './ManualJournalsDescription';
 
@@ -1066,9 +1066,48 @@ export class Xeroplus implements INodeType {
 						if (options.orderBy) {
 							qs.order = `${options.orderBy} ${ options.sortOrder ?? 'DESC' }`;
 						}
-						if (options.where) {
+						
+						// Where clause handling
+						let whereClause = '';
+						
+						// Use custom where if provided, otherwise build from filters
+						if (options.customWhere) {
+							whereClause = options.customWhere as string;
+						} else if (options.whereFilters) {
+							const filters = (options.whereFilters as IDataObject).filters as IDataObject[];
+							if (filters && filters.length > 0) {
+								const whereParts: string[] = [];
+								for (const filter of filters) {
+									const field = filter.field as string;
+									
+									switch (field) {
+										case 'AccountNumber':
+											if (filter.accountNumberValue) {
+												whereParts.push(`AccountNumber=="${filter.accountNumberValue}"`);
+											}
+											break;
+										case 'EmailAddress':
+											if (filter.emailAddressValue) {
+												whereParts.push(`EmailAddress=="${filter.emailAddressValue}"`);
+											}
+											break;
+										case 'Name':
+											if (filter.nameValue) {
+												whereParts.push(`Name=="${filter.nameValue}"`);
+											}
+											break;
+									}
+								}
+								whereClause = whereParts.join(' && ');
+							}
+						}
+						
+						if (whereClause) {
+							qs.where = whereClause;
+						} else if (options.where) {
 							qs.where = options.where;
 						}
+						
 						if (options.createdByMyApp) {
 							qs.createdByMyApp = options.createdByMyApp as boolean;
 						}

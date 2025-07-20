@@ -886,32 +886,100 @@ export const invoiceFields: INodeProperties[] = [
 						displayName: 'Filter',
 						values: [
 							{
-						displayName: 'Contact ID',
-						name: 'contactIdValue',
-						type: 'string',
-						default: '',
-						placeholder: '96988e67-ecf9-466d-bfbf-0afa1725a649',
-						description: 'Contact GUID',
+								displayName: 'Contact Name',
+								name: 'contactNameValue',
+								type: 'string',
+								default: '',
+								placeholder: 'ABC Limited',
+								description: 'Contact name to filter by',
+								displayOptions: {
+									show: {
+										field: ['Contact.Name'],
+									},
+								},
 							},
 							{
-						displayName: 'Contact Name',
-						name: 'contactNameValue',
-						type: 'string',
-						default: '',
-						placeholder: 'ABC Limited',
+								displayName: 'Contact Name or ID',
+								name: 'contactIdValue',
+								type: 'options',
+								description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+								typeOptions: {
+									loadOptionsMethod: 'getContacts',
+									loadOptionsDependsOn: ['/organizationId'],
+								},
+								default: '',
+								displayOptions: {
+									show: {
+										field: ['Contact.ContactID'],
+									},
+								},
 							},
 							{
-						displayName: 'Contact Number',
-						name: 'contactNumberValue',
-						type: 'string',
-						default: '',
-						placeholder: 'ID001',
+								displayName: 'Contact Number',
+								name: 'contactNumberValue',
+								type: 'string',
+								default: '',
+								placeholder: 'ID001',
+								description: 'Contact number to filter by',
+								displayOptions: {
+									show: {
+										field: ['Contact.ContactNumber'],
+									},
+								},
 							},
 							{
-						displayName: 'Field',
-						name: 'field',
-						type: 'options',
-						options: [
+								displayName: 'Date From',
+								name: 'dateFromValue',
+								type: 'dateTime',
+								default: '',
+								description: 'Filter invoices from this date',
+								displayOptions: {
+									show: {
+										field: ['DateRange'],
+									},
+								},
+							},
+							{
+								displayName: 'Date To',
+								name: 'dateToValue',
+								type: 'dateTime',
+								default: '',
+								description: 'Filter invoices to this date',
+								displayOptions: {
+									show: {
+										field: ['DateRange'],
+									},
+								},
+							},
+							{
+								displayName: 'Due Date From',
+								name: 'dueDateFromValue',
+								type: 'dateTime',
+								default: '',
+								description: 'Filter invoices with due date from this date',
+								displayOptions: {
+									show: {
+										field: ['DueDateRange'],
+									},
+								},
+							},
+							{
+								displayName: 'Due Date To',
+								name: 'dueDateToValue',
+								type: 'dateTime',
+								default: '',
+								description: 'Filter invoices with due date to this date',
+								displayOptions: {
+									show: {
+										field: ['DueDateRange'],
+									},
+								},
+							},
+							{
+								displayName: 'Field',
+								name: 'field',
+								type: 'options',
+								options: [
 									{
 										name: 'Amount Due Range',
 										value: 'AmountDueRange',
@@ -961,79 +1029,101 @@ export const invoiceFields: INodeProperties[] = [
 										value: 'Type',
 									},
 								],
-						default: 'Status',
-						description: 'Field to filter on',
+								default: 'Status',
+								description: 'Field to filter on',
 							},
 							{
-						displayName: 'From Date',
-						name: 'dateFromValue',
-						type: 'dateTime',
-						default: '',
-						description: 'Start date for range (leave empty for no minimum)',
+								displayName: 'Invoice ID',
+								name: 'invoiceIdValue',
+								type: 'string',
+								default: '',
+								placeholder: '220ddca8-3144-4085-9a88-2d72c5133734',
+								description: 'Invoice GUID to filter by',
+								displayOptions: {
+									show: {
+										field: ['InvoiceId'],
+									},
+								},
 							},
 							{
-						displayName: 'From Due Date',
-						name: 'dueDateFromValue',
-						type: 'dateTime',
-						default: '',
-						description: 'Start due date for range (leave empty for no minimum)',
+								displayName: 'Invoice Number',
+								name: 'invoiceNumberValue',
+								type: 'string',
+								default: '',
+								placeholder: 'INV-001',
+								description: 'Invoice number to filter by',
+								displayOptions: {
+									show: {
+										field: ['InvoiceNumber'],
+									},
+								},
 							},
 							{
-						displayName: 'Invoice ID',
-						name: 'invoiceIdValue',
-						type: 'string',
-						default: '',
-						placeholder: '220ddca8-3144-4085-9a88-2d72c5133734',
-						description: 'Invoice GUID',
+								displayName: 'Maximum Amount Due',
+								name: 'amountDueMaxValue',
+								type: 'number',
+								default: '',
+								description: 'Filter invoices with amount due less than or equal to this amount',
+								displayOptions: {
+									show: {
+										field: ['AmountDueRange'],
+									},
+								},
 							},
 							{
-						displayName: 'Invoice Number',
-						name: 'invoiceNumberValue',
-						type: 'string',
-						default: '',
-						placeholder: 'INV-001',
+								displayName: 'Maximum Amount Paid',
+								name: 'amountPaidMaxValue',
+								type: 'number',
+								default: '',
+								description: 'Filter invoices with amount paid less than or equal to this amount',
+								displayOptions: {
+									show: {
+										field: ['AmountPaidRange'],
+									},
+								},
 							},
 							{
-						displayName: 'Maximum Amount Due',
-						name: 'amountDueMaxValue',
-						type: 'number',
-						default: '',
-						description: 'Maximum amount due (leave empty for no maximum)',
+								displayName: 'Minimum Amount Due',
+								name: 'amountDueMinValue',
+								type: 'number',
+								default: '',
+								description: 'Filter invoices with amount due greater than or equal to this amount',
+								displayOptions: {
+									show: {
+										field: ['AmountDueRange'],
+									},
+								},
 							},
 							{
-						displayName: 'Maximum Amount Paid',
-						name: 'amountPaidMaxValue',
-						type: 'number',
-						default: '',
-						description: 'Maximum amount paid (leave empty for no maximum)',
+								displayName: 'Minimum Amount Paid',
+								name: 'amountPaidMinValue',
+								type: 'number',
+								default: '',
+								description: 'Filter invoices with amount paid greater than or equal to this amount',
+								displayOptions: {
+									show: {
+										field: ['AmountPaidRange'],
+									},
+								},
 							},
 							{
-						displayName: 'Minimum Amount Due',
-						name: 'amountDueMinValue',
-						type: 'number',
-						default: '',
-						description: 'Minimum amount due (leave empty for no minimum)',
+								displayName: 'Reference',
+								name: 'referenceValue',
+								type: 'string',
+								default: '',
+								placeholder: 'REF12',
+								description: 'Invoice reference to filter by',
+								displayOptions: {
+									show: {
+										field: ['Reference'],
+									},
+								},
 							},
 							{
-						displayName: 'Minimum Amount Paid',
-						name: 'amountPaidMinValue',
-						type: 'number',
-						default: '',
-						description: 'Minimum amount paid (leave empty for no minimum)',
-							},
-							{
-						displayName: 'Reference',
-						name: 'referenceValue',
-						type: 'string',
-						default: '',
-						placeholder: 'REF12',
-						description: 'Invoice reference',
-							},
-							{
-						displayName: 'Status',
-						name: 'statusValue',
-						type: 'options',
-						options: [
+								displayName: 'Status',
+								name: 'statusValue',
+								type: 'options',
+								options: [
 									{
 										name: 'Authorised',
 										value: 'AUTHORISED',
@@ -1066,28 +1156,20 @@ export const invoiceFields: INodeProperties[] = [
 										name: 'Voided',
 										value: 'VOIDED',
 									},
-					],
-						default: 'AUTHORISED',
+								],
+								default: 'AUTHORISED',
+								description: 'Status to filter by',
+								displayOptions: {
+									show: {
+										field: ['Status'],
+									},
+								},
 							},
 							{
-						displayName: 'To Date',
-						name: 'dateToValue',
-						type: 'dateTime',
-						default: '',
-						description: 'End date for range (leave empty for no maximum)',
-							},
-							{
-						displayName: 'To Due Date',
-						name: 'dueDateToValue',
-						type: 'dateTime',
-						default: '',
-						description: 'End due date for range (leave empty for no maximum)',
-							},
-							{
-						displayName: 'Type',
-						name: 'typeValue',
-						type: 'options',
-						options: [
+								displayName: 'Type',
+								name: 'typeValue',
+								type: 'options',
+								options: [
 									{
 										name: 'Sales Invoice',
 										value: 'ACCREC',
@@ -1096,10 +1178,16 @@ export const invoiceFields: INodeProperties[] = [
 										name: 'Bill',
 										value: 'ACCPAY',
 									},
-					],
-						default: 'ACCREC',
+								],
+								default: 'ACCREC',
+								description: 'Invoice type to filter by',
+								displayOptions: {
+									show: {
+										field: ['Type'],
+									},
+								},
 							},
-					],
+						],
 					},
 				],
 			},
