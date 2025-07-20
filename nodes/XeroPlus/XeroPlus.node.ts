@@ -22,8 +22,12 @@ import { attachmentsFields, attachmentsOperations } from './AttachmentsDescripti
 import { accountsFields, accountsOperations } from './AccountsDescription';
 import { organisationFields, organisationOperations } from './OrganisationsDescription';
 import { reportFields, reportOperations } from './ReportDescription';
+import { banktransactionsFields, banktransactionsOperations } from './BankTransactionsDescription';
+import { banktransferFields, banktransferOperations } from './BankTransfers';
+import { historyandnotesFields, historyandnotesOperations } from './HistoryandNotesDescription';
 
-export class XeroPlus implements INodeType {
+
+export class Xeroplus implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Xero +',
 		name: 'xeroplus',
@@ -52,24 +56,36 @@ export class XeroPlus implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Organisation',
-						value: 'organisation',
-					},
-					{
-						name: 'Contact',
-						value: 'contact',
-					},
-					{
-						name: 'Invoice',
-						value: 'invoice',
-					},
-					{
 						name: 'Account',
 						value: 'accounts',
 					},
 					{
 						name: 'Attachment',
 						value: 'attachments',
+					},
+					{
+						name: 'Bank Transaction',
+						value: 'banktransactions',
+					},
+					{
+						name: 'Bank Transfer',
+						value: 'banktransfers',
+					},
+					{
+						name: 'Contact',
+						value: 'contact',
+					},
+					{
+						name: 'History and Note',
+						value: 'historyandnotes',
+					},
+					{
+						name: 'Invoice',
+						value: 'invoice',
+					},
+					{
+						name: 'Organisation',
+						value: 'organisation',
 					},
 					{
 						name: 'Report',
@@ -96,6 +112,15 @@ export class XeroPlus implements INodeType {
 			// REPORT
 			...reportOperations,
 			...reportFields,
+			// BANK TRANSACTIONS
+			...banktransactionsOperations,
+			...banktransactionsFields,
+			// BANK TRANSFERS
+			...banktransferOperations,
+			...banktransferFields,
+			// HISTORY AND NOTES
+			...historyandnotesOperations,
+			...historyandnotesFields,
 		],
 	};
 
@@ -159,7 +184,7 @@ export class XeroPlus implements INodeType {
 				}
 				return returnData;
 			},
-			// Get all the brading themes to display them to user so that they can
+			// Get all the branding themes to display them to user so that they can
 			// select them easily
 			async getBrandingThemes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const organizationId = this.getCurrentNodeParameter('organizationId');
@@ -180,7 +205,7 @@ export class XeroPlus implements INodeType {
 				}
 				return returnData;
 			},
-			// Get all the brading themes to display them to user so that they can
+			// Get all the currencies to display them to user so that they can
 			// select them easily
 			async getCurrencies(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const organizationId = this.getCurrentNodeParameter('organizationId');
@@ -198,65 +223,143 @@ export class XeroPlus implements INodeType {
 				}
 				return returnData;
 			},
-			// Get account list (AccountID) for pickers
-			async getAccounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+
+			// Get bank accounts only (for bank transactions)
+			async getBankAccounts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const organizationId = this.getCurrentNodeParameter('organizationId');
 				const returnData: INodePropertyOptions[] = [];
 
 				if (!organizationId) {
-					// Organization not selected yet
 					return returnData;
 				}
 
 				const { Accounts: accounts } = await xeroApiRequest.call(this, 'GET', '/Accounts', { organizationId });
 
 				for (const account of accounts as IDataObject[]) {
-					const name = `${account.Name as string} (${account.Code as string})`;
-					const id = account.AccountID as string;
+					// Only include bank accounts (Type === 'BANK')
+					if (account.Type === 'BANK') {
+						const name = `${account.Name as string} (${account.Code as string})`;
+						const id = account.AccountID as string;
+						returnData.push({ name, value: id });
+					}
+				}
+
+				return returnData;
+			},
+
+			// Get contacts from organisation
+			async getContacts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const organizationId = this.getCurrentNodeParameter('organizationId');
+				const returnData: INodePropertyOptions[] = [];
+
+				if (!organizationId) {
+					return returnData;
+				}
+
+				const { Contacts: contacts } = await xeroApiRequest.call(this, 'GET', '/Contacts', { organizationId }, { order: 'Name ASC' });
+
+				for (const contact of contacts as IDataObject[]) {
+					const name = contact.Name as string;
+					const id = contact.ContactID as string;
 					returnData.push({ name, value: id });
 				}
 
 				return returnData;
 			},
-			// Get all the tracking categories to display them to user so that they can
-			// select them easily
-			async getTrakingCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const organizationId = this.getCurrentNodeParameter('organizationId');
+			
+
+			/* -------------------------------------------------------------------------- 
+  			 This method was commented out due to issues with tracking options not loading
+			 correctly. Consistently returns an empty array.                    
+   		    -------------------------------------------------------------------------- */
+
+			/*
+			// Get all the tracking categories to display them to user so that they can select them easily
+			async getTrackingCategories(
+				this: ILoadOptionsFunctions,
+			): Promise<INodePropertyOptions[]> {
+
+				const organizationId = this.getCurrentNodeParameter('organizationId') as string;
 				const returnData: INodePropertyOptions[] = [];
-				const { TrackingCategories: categories } = await xeroApiRequest.call(
-					this,
-					'GET',
-					'/TrackingCategories',
-					{ organizationId },
-				);
-				for (const category of categories) {
-					const categoryName = category.Name;
-					const categoryId = category.TrackingCategoryID;
+
+				// Hit Xero only if we don’t already have the data
+				let categories = (this as unknown as { _trackingCache?: IDataObject[] })._trackingCache;
+
+				if (!categories) {
+					const { TrackingCategories } = await xeroApiRequest.call(
+						this,
+						'GET',
+						'/TrackingCategories',
+						{ organizationId },
+					);
+
+					// Keep the raw list in memory – it survives during the node-edit session
+					(this as unknown as { _trackingCache: IDataObject[] })._trackingCache = TrackingCategories;
+					categories = TrackingCategories;
+				}
+
+				// Build the dropdown
+				// If no categories were returned, simply return the empty array
+				if (!categories) return returnData;
+				// Populate and return the dropdown list
+				for (const c of categories) {
 					returnData.push({
-						name: categoryName,
-						value: categoryId,
+						name: c.Name as string,
+						value: c.TrackingCategoryID as string,
 					});
 				}
 				return returnData;
 			},
-			// // Get all the tracking categories to display them to user so that they can
-			// // select them easily
-			// async getTrakingOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-			// 	const organizationId = this.getCurrentNodeParameter('organizationId');
-			// 	const name = this.getCurrentNodeParameter('name');
-			// 	const returnData: INodePropertyOptions[] = [];
-			// 	const { TrackingCategories: categories } = await xeroApiRequest.call(this, 'GET', '/TrackingCategories', { organizationId });
-			// 	const { Options: options } = categories.filter((category: IDataObject) => category.Name === name)[0];
-			// 	for (const option of options) {
-			// 		const optionName = option.Name;
-			// 		const optionId = option.TrackingOptionID;
-			// 		returnData.push({
-			// 			name: optionName,
-			// 			value: optionId,
-			// 		});
-			// 	}
-			// 	return returnData;
-			// },
+
+			// 2)  Tracking options  ───────────────────────────────────────────────────
+			async getTrackingOptions(
+				this: ILoadOptionsFunctions,
+			): Promise<INodePropertyOptions[]> {
+
+				const organizationId = this.getCurrentNodeParameter('organizationId') as string;
+				const returnData: INodePropertyOptions[] = [];
+				let trackingCategoryId: string | undefined;
+				try {
+					trackingCategoryId = this.getCurrentNodeParameter('/name') as string;
+				} catch {}
+				if (!trackingCategoryId) {
+					try {
+						trackingCategoryId = this.getCurrentNodeParameter('name') as string;
+					} catch {}
+				}
+
+				if (!trackingCategoryId) {
+					return returnData;
+				}
+
+				// Use the cache from step 1
+				let categories = (this as unknown as { _trackingCache?: IDataObject[] })._trackingCache;
+
+				// If the user opened the “Option” list first (rare) we won’t have a cache yet
+				if (!categories) {
+					const response = await xeroApiRequest.call(
+						this,
+						'GET',
+						'/TrackingCategories',
+						{ organizationId },
+						{ TrackingCategoryID: trackingCategoryId },
+					);
+					categories = response.TrackingCategories;
+				}
+
+				const category = categories!.find(
+					(c) => c.TrackingCategoryID === trackingCategoryId,
+				);
+
+				if (!category || !category.Options) return [];
+
+				// Build the dropdown from the cached options
+				return (category.Options as IDataObject[]).map((o) => ({
+					name: o.Name as string,
+					value: o.Name as string,   // Xero expects the name, not the GUID, in the payload
+				}));
+			},
+			*/
 		},
 	};
 
@@ -282,6 +385,80 @@ export class XeroPlus implements INodeType {
 					if (operation === 'getAll') {
 						responseData = await xeroApiRequest.call(this, 'GET', '', {}, {}, 'https://api.xero.com/connections');
 						responseData = responseData;
+					}
+					if (operation === 'getUsers') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const options = this.getNodeParameter('options', i) as IDataObject;
+						const headers: IDataObject = {};
+
+						if (options.orderBy) {
+							qs.order = `${options.orderBy} ${options.sortOrder ?? 'ASC'}`;
+						}
+
+						// Where clause handling
+						let whereClause = '';
+						
+						// Use custom where if provided, otherwise build from filters
+						if (options.customWhere) {
+							whereClause = options.customWhere as string;
+						} else if (options.whereFilters) {
+							const filters = (options.whereFilters as IDataObject).filters as IDataObject[];
+							if (filters && filters.length > 0) {
+								const whereParts: string[] = [];
+								for (const filter of filters) {
+									const field = filter.field as string;
+									
+									switch (field) {
+										case 'EmailAddress':
+											if (filter.emailAddressValue) {
+												whereParts.push(`EmailAddress=="${filter.emailAddressValue}"`);
+											}
+											break;
+										case 'FirstName':
+											if (filter.firstNameValue) {
+												whereParts.push(`FirstName=="${filter.firstNameValue}"`);
+											}
+											break;
+										case 'LastName':
+											if (filter.lastNameValue) {
+												whereParts.push(`LastName=="${filter.lastNameValue}"`);
+											}
+											break;
+										case 'IsSubscriber':
+											if (filter.isSubscriberValue !== undefined) {
+												whereParts.push(`IsSubscriber==${filter.isSubscriberValue}`);
+											}
+											break;
+										case 'OrganisationRole':
+											if (filter.organisationRoleValue) {
+												whereParts.push(`OrganisationRole=="${filter.organisationRoleValue}"`);
+											}
+											break;
+									}
+								}
+								whereClause = whereParts.join(' && ');
+							}
+						}
+						
+						if (whereClause) {
+							qs.where = whereClause;
+						}
+
+						// Handler for If-Modified-Since header
+						if (options['If-Modified-Since']) {
+							headers['If-Modified-Since'] = options['If-Modified-Since'] as string;
+						}
+
+						responseData = await xeroApiRequest.call(
+							this,
+							'GET',
+							'/Users',
+							{ organizationId },
+							qs,
+							undefined,
+							headers,
+						);
+						responseData = responseData.Users;
 					}
 				}
 
@@ -1331,6 +1508,524 @@ export class XeroPlus implements INodeType {
 							responseData = transformReport(responseData);
 						}
 					}					
+				}
+
+				// BANK TRANSACTIONS
+				if (resource === 'banktransactions') {
+					// Create
+					if (operation === 'create') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const type = this.getNodeParameter('type', i) as string;
+						const contactId = this.getNodeParameter('contactId', i) as string;
+						const bankAccountId = this.getNodeParameter('bankAccountId', i) as string;
+						const lineItemsInputMethod = this.getNodeParameter('lineItemsInputMethod', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						const body: IDataObject = {
+							organizationId,
+							Type: type,
+							Contact: { ContactID: contactId },
+							BankAccount: { AccountID: bankAccountId },
+							LineItems: [],
+						};
+
+						// Handle line items based on input method
+						if (lineItemsInputMethod === 'ui') {
+							const lineItemsValues = (this.getNodeParameter('lineItemsUi', i) as IDataObject)
+								.lineItemsValues as IDataObject[];
+
+							if (lineItemsValues && lineItemsValues.length > 0) {
+								const lineItems: IDataObject[] = [];
+								for (const lineItemValue of lineItemsValues) {
+									const lineItem: IDataObject = {};
+									
+									if (lineItemValue.description) lineItem.Description = lineItemValue.description as string;
+									if (lineItemValue.quantity) lineItem.Quantity = lineItemValue.quantity as number;
+									if (lineItemValue.unitAmount) lineItem.UnitAmount = lineItemValue.unitAmount as string;
+									if (lineItemValue.lineAmount) lineItem.LineAmount = lineItemValue.lineAmount as string;
+									if (lineItemValue.accountCode) lineItem.AccountCode = lineItemValue.accountCode as string;
+									if (lineItemValue.itemCode) lineItem.ItemCode = lineItemValue.itemCode as string;
+									if (lineItemValue.taxType) lineItem.TaxType = lineItemValue.taxType as string;
+									if (lineItemValue.taxAmount) lineItem.TaxAmount = lineItemValue.taxAmount as string;
+									if (lineItemValue.lineItemId) lineItem.LineItemID = lineItemValue.lineItemId as string;
+
+									// Handle tracking categories
+									if (lineItemValue.trackingUi) {
+										const trackingValues = (lineItemValue.trackingUi as IDataObject)
+											.trackingValues as IDataObject[];
+										if (trackingValues && trackingValues.length > 0) {
+											const tracking: IDataObject[] = [];
+											for (const trackingValue of trackingValues) {
+												const categoryName = trackingValue.name as string;
+												const optionName = trackingValue.option as string;
+												
+												if (categoryName && optionName) {
+													tracking.push({
+														Name: categoryName,
+														Option: optionName,
+													});
+												}
+											}
+											lineItem.Tracking = tracking;
+										}
+									}
+
+									lineItems.push(lineItem);
+								}
+								body.LineItems = lineItems;
+							}
+						} else if (lineItemsInputMethod === 'json') {
+							const lineItemsJson = this.getNodeParameter('lineItemsJson', i) as string;
+							try {
+								const lineItems = JSON.parse(lineItemsJson);
+								body.LineItems = lineItems;
+							} catch (error) {
+								throw new NodeOperationError(this.getNode(), `Invalid JSON in Line Items: ${error.message}`);
+							}
+						}
+
+						// Add additional fields
+						if (additionalFields.date) body.Date = additionalFields.date as string;
+						if (additionalFields.reference) body.Reference = additionalFields.reference as string;
+						if (additionalFields.isReconciled !== undefined) body.IsReconciled = additionalFields.isReconciled as boolean;
+						if (additionalFields.currencyCode) body.CurrencyCode = additionalFields.currencyCode as string;
+						if (additionalFields.currencyRate) body.CurrencyRate = additionalFields.currencyRate as string;
+						if (additionalFields.url) body.Url = additionalFields.url as string;
+						if (additionalFields.status) body.Status = additionalFields.status as string;
+						if (additionalFields.lineAmountTypes) body.LineAmountTypes = additionalFields.lineAmountTypes as string;
+
+						responseData = await xeroApiRequest.call(this, 'PUT', '/BankTransactions', body);
+						responseData = responseData.BankTransactions;
+					}
+					// Get
+					if (operation === 'get') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const bankTransactionId = this.getNodeParameter('bankTransactionId', i) as string;
+						responseData = await xeroApiRequest.call(this, 'GET', `/BankTransactions/${bankTransactionId}`, { organizationId });
+						responseData = responseData.BankTransactions;
+					}
+					// Get Many
+					if (operation === 'getAll') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const options = this.getNodeParameter('options', i) as IDataObject;
+						const headers: IDataObject = {};
+
+						if (options.types) {
+							qs.types = (options.types as string[]).join(',');
+						}
+
+						if (options.statuses) {
+							qs.statuses = (options.statuses as string[]).join(',');
+						}
+
+						if (options.orderBy) {
+							qs.order = `${options.orderBy} ${options.sortOrder ?? 'DESC'}`;
+						}
+
+						let whereClause = '';
+
+						// Use custom where if provided, otherwise build from filters
+						if (options.customWhere) {
+							whereClause = options.customWhere as string;
+						} else if (options.whereFilters) {
+							const filters = (options.whereFilters as IDataObject).filters as IDataObject[];
+							if (filters && filters.length > 0) {
+								const whereParts: string[] = [];
+								for (const filter of filters) {
+									const field = filter.field as string;
+
+									switch (field) {
+										case 'Type':
+											if (filter.typeValue) {
+												whereParts.push(`Type=="${filter.typeValue}"`);
+											}
+											break;
+										case 'Status':
+											if (filter.statusValue) {
+												whereParts.push(`Status=="${filter.statusValue}"`);
+											}
+											break;
+										case 'Contact.ContactID':
+											if (filter.contactIdValue) {
+												whereParts.push(`Contact.ContactID==guid("${filter.contactIdValue}")`);
+											}
+											break;
+										case 'Contact.Name':
+											if (filter.contactNameValue) {
+												whereParts.push(`Contact.Name=="${filter.contactNameValue}"`);
+											}
+											break;
+										case 'BankAccount.AccountID':
+											if (filter.bankAccountIdValue) {
+												whereParts.push(`BankAccount.AccountID==guid("${filter.bankAccountIdValue}")`);
+											}
+											break;
+										case 'BankAccount.Code':
+											if (filter.bankAccountCodeValue) {
+												whereParts.push(`BankAccount.Code=="${filter.bankAccountCodeValue}"`);
+											}
+											break;
+										case 'Reference':
+											if (filter.referenceValue) {
+												whereParts.push(`Reference=="${filter.referenceValue}"`);
+											}
+											break;
+										case 'IsReconciled':
+											if (filter.isReconciledValue !== undefined) {
+												whereParts.push(`IsReconciled==${filter.isReconciledValue}`);
+											}
+											break;
+										case 'DateRange':
+											const dateFrom = filter.dateFromValue as string;
+											const dateTo = filter.dateToValue as string;
+											const dateParts: string[] = [];
+											if (dateFrom) {
+												const fromDate = new Date(dateFrom);
+												dateParts.push(`Date>=DateTime(${fromDate.getFullYear()}, ${String(fromDate.getMonth() + 1).padStart(2, '0')}, ${String(fromDate.getDate()).padStart(2, '0')})`);
+											}
+											if (dateTo) {
+												const toDate = new Date(dateTo);
+												dateParts.push(`Date<=DateTime(${toDate.getFullYear()}, ${String(toDate.getMonth() + 1).padStart(2, '0')}, ${String(toDate.getDate()).padStart(2, '0')})`);
+											}
+											if (dateParts.length > 0) {
+												whereParts.push(dateParts.join(' && '));
+											}
+											break;
+										case 'TotalRange':
+											const totalMin = filter.totalMinValue as number;
+											const totalMax = filter.totalMaxValue as number;
+											const totalParts: string[] = [];
+											if (totalMin !== undefined && totalMin !== null && !isNaN(totalMin)) {
+												totalParts.push(`Total>=${totalMin}`);
+											}
+											if (totalMax !== undefined && totalMax !== null && !isNaN(totalMax)) {
+												totalParts.push(`Total<=${totalMax}`);
+											}
+											if (totalParts.length > 0) {
+												whereParts.push(totalParts.join(' && '));
+											}
+											break;
+									}
+								}
+								whereClause = whereParts.join(' && ');
+							}
+						}
+
+						if (whereClause) {
+							qs.where = whereClause;
+						}
+
+						// Handle If-Modified-Since header
+						if (options['If-Modified-Since']) {
+							headers['If-Modified-Since'] = options['If-Modified-Since'] as string;
+						}
+
+						// Handle pagination
+						if (options.page) {
+							qs.page = options.page as number;
+						}
+						if (options.pageSize) {
+							qs.pageSize = options.pageSize as number;
+						}
+						
+							responseData = await xeroApiRequest.call(
+								this,
+								'GET',
+								'/BankTransactions',
+								{ organizationId },
+								qs,
+								undefined,
+								headers,
+							);
+						responseData = responseData.BankTransactions;
+					}
+					// Create
+					if (operation === 'create') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const type = this.getNodeParameter('type', i) as string;
+						const contactId = this.getNodeParameter('contactId', i) as string;
+						const bankAccountId = this.getNodeParameter('bankAccountId', i) as string;
+						const lineItemsInputMethod = this.getNodeParameter('lineItemsInputMethod', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						const body: IDataObject = {
+							organizationId,
+							Type: type,
+							Contact: { ContactID: contactId },
+							BankAccount: { AccountID: bankAccountId },
+							LineItems: [],
+						};
+
+						// Handle line items based on input method
+						if (lineItemsInputMethod === 'ui') {
+							const lineItemsValues = (this.getNodeParameter('lineItemsUi', i) as IDataObject)
+								.lineItemsValues as IDataObject[];
+
+							if (lineItemsValues && lineItemsValues.length > 0) {
+								const lineItems: IDataObject[] = [];
+								for (const lineItemValue of lineItemsValues) {
+									const lineItem: IDataObject = {};
+									
+									if (lineItemValue.description) lineItem.Description = lineItemValue.description as string;
+									if (lineItemValue.quantity) lineItem.Quantity = lineItemValue.quantity as number;
+									if (lineItemValue.unitAmount) lineItem.UnitAmount = lineItemValue.unitAmount as string;
+									if (lineItemValue.lineAmount) lineItem.LineAmount = lineItemValue.lineAmount as string;
+									if (lineItemValue.accountCode) lineItem.AccountCode = lineItemValue.accountCode as string;
+									if (lineItemValue.itemCode) lineItem.ItemCode = lineItemValue.itemCode as string;
+									if (lineItemValue.taxType) lineItem.TaxType = lineItemValue.taxType as string;
+									if (lineItemValue.taxAmount) lineItem.TaxAmount = lineItemValue.taxAmount as string;
+									if (lineItemValue.lineItemId) lineItem.LineItemID = lineItemValue.lineItemId as string;
+
+									// Handle tracking categories
+									if (lineItemValue.trackingUi) {
+										const trackingValues = (lineItemValue.trackingUi as IDataObject)
+											.trackingValues as IDataObject[];
+										if (trackingValues && trackingValues.length > 0) {
+											const tracking: IDataObject[] = [];
+											for (const trackingValue of trackingValues) {
+												const categoryName = trackingValue.name as string;
+												const optionName = trackingValue.option as string;
+												
+												if (categoryName && optionName) {
+													tracking.push({
+														Name: categoryName,
+														Option: optionName,
+													});
+												}
+											}
+											lineItem.Tracking = tracking;
+										}
+									}
+
+									lineItems.push(lineItem);
+								}
+								body.LineItems = lineItems;
+							}
+						} else if (lineItemsInputMethod === 'json') {
+							const lineItemsJson = this.getNodeParameter('lineItemsJson', i) as string;
+							try {
+								const lineItems = JSON.parse(lineItemsJson);
+								body.LineItems = lineItems;
+							} catch (error) {
+								throw new NodeOperationError(this.getNode(), `Invalid JSON in Line Items: ${error.message}`);
+							}
+						}
+
+						// Add additional fields
+						if (additionalFields.date) body.Date = additionalFields.date as string;
+						if (additionalFields.reference) body.Reference = additionalFields.reference as string;
+						if (additionalFields.isReconciled !== undefined) body.IsReconciled = additionalFields.isReconciled as boolean;
+						if (additionalFields.currencyCode) body.CurrencyCode = additionalFields.currencyCode as string;
+						if (additionalFields.currencyRate) body.CurrencyRate = additionalFields.currencyRate as string;
+						if (additionalFields.url) body.Url = additionalFields.url as string;
+						if (additionalFields.status) body.Status = additionalFields.status as string;
+						if (additionalFields.lineAmountTypes) body.LineAmountTypes = additionalFields.lineAmountTypes as string;
+
+						responseData = await xeroApiRequest.call(this, 'PUT', '/BankTransactions', body);
+						responseData = responseData.BankTransactions;
+					}				
+				}
+
+				// BANK TRANSFERS
+				if (resource === 'banktransfers') {
+					// Create
+					if (operation === 'create') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const fromBankAccountId = this.getNodeParameter('fromBankAccountId', i) as string;
+						const toBankAccountId = this.getNodeParameter('toBankAccountId', i) as string;
+						const amount = this.getNodeParameter('amount', i) as number;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						const bankTransfer: IDataObject = {
+							FromBankAccount: { AccountID: fromBankAccountId },
+							ToBankAccount: { AccountID: toBankAccountId },
+							Amount: amount,
+						};
+
+						// Add optional fields
+						if (additionalFields.date) {
+							bankTransfer.Date = additionalFields.date as string;
+						}
+						if (additionalFields.reference) {
+							bankTransfer.Reference = additionalFields.reference as string;
+						}
+						if (additionalFields.FromIsReconciled !== undefined) {
+							bankTransfer.FromIsReconciled = additionalFields.FromIsReconciled as boolean;
+						}
+						if (additionalFields.ToIsReconciled !== undefined) {
+							bankTransfer.ToIsReconciled = additionalFields.ToIsReconciled as boolean;
+						}
+
+						const body: IDataObject = {
+							organizationId,
+							BankTransfers: [bankTransfer],
+						};
+
+						responseData = await xeroApiRequest.call(this, 'PUT', '/BankTransfers', body);
+						responseData = responseData.BankTransfers;
+					}
+					// Get
+					if (operation === 'get') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const bankTransferId = this.getNodeParameter('bankTransferId', i) as string;
+						responseData = await xeroApiRequest.call(this, 'GET', `/BankTransfers/${bankTransferId}`, { organizationId });
+						responseData = responseData.BankTransfers;
+					}
+					// Get All
+					if (operation === 'getAll') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const options = this.getNodeParameter('options', i) as IDataObject;
+						const headers: IDataObject = {};
+
+						if (options.orderBy) {
+							qs.order = `${options.orderBy} ${options.sortOrder ?? 'DESC'}`;
+						}
+
+						// Where clause handling
+						let whereClause = '';
+						
+						// Use custom where if provided, otherwise build from filters
+						if (options.customWhere) {
+							whereClause = options.customWhere as string;
+						} else if (options.whereFilters) {
+							const filters = (options.whereFilters as IDataObject).filters as IDataObject[];
+							if (filters && filters.length > 0) {
+								const whereParts: string[] = [];
+								for (const filter of filters) {
+									const field = filter.field as string;
+									
+									switch (field) {
+										case 'Amount':
+											if (filter.amountRange) {
+												const amountRangeValues = (filter.amountRange as IDataObject).amountRangeValues as IDataObject;
+												if (amountRangeValues) {
+													const amountMin = amountRangeValues.amountMin as number;
+													const amountMax = amountRangeValues.amountMax as number;
+													const amountParts: string[] = [];
+													if (amountMin !== undefined && amountMin !== null && !isNaN(amountMin)) {
+														amountParts.push(`Amount>=${amountMin}`);
+													}
+													if (amountMax !== undefined && amountMax !== null && !isNaN(amountMax)) {
+														amountParts.push(`Amount<=${amountMax}`);
+													}
+													if (amountParts.length > 0) {
+														whereParts.push(amountParts.join(' && '));
+													}
+												}
+											}
+											break;
+										case 'Date':
+											if (filter.dateRange) {
+												const dateRangeValues = (filter.dateRange as IDataObject).dateRangeValues as IDataObject;
+												if (dateRangeValues) {
+													const dateFrom = dateRangeValues.dateFrom as string;
+													const dateTo = dateRangeValues.dateTo as string;
+													const dateParts: string[] = [];
+													if (dateFrom) {
+														const fromDate = new Date(dateFrom);
+														dateParts.push(`Date>=DateTime(${fromDate.getFullYear()}, ${String(fromDate.getMonth() + 1).padStart(2, '0')}, ${String(fromDate.getDate()).padStart(2, '0')})`);
+													}
+													if (dateTo) {
+														const toDate = new Date(dateTo);
+														dateParts.push(`Date<=DateTime(${toDate.getFullYear()}, ${String(toDate.getMonth() + 1).padStart(2, '0')}, ${String(toDate.getDate()).padStart(2, '0')})`);
+													}
+													if (dateParts.length > 0) {
+														whereParts.push(dateParts.join(' && '));
+													}
+												}
+											}
+											break;
+										case 'Reference':
+											if (filter.referenceValue) {
+												whereParts.push(`Reference=="${filter.referenceValue}"`);
+											}
+											break;
+										case 'FromIsReconciled':
+											if (filter.fromIsReconciledValue !== undefined) {
+												whereParts.push(`FromIsReconciled==${filter.fromIsReconciledValue}`);
+											}
+											break;
+										case 'ToIsReconciled':
+											if (filter.toIsReconciledValue !== undefined) {
+												whereParts.push(`ToIsReconciled==${filter.toIsReconciledValue}`);
+											}
+											break;
+										case 'HasAttachments':
+											if (filter.hasAttachmentsValue !== undefined) {
+												whereParts.push(`HasAttachments==${filter.hasAttachmentsValue}`);
+											}
+											break;
+										case 'FromBankAccount.Name':
+											if (filter.fromBankAccountNameValue) {
+												whereParts.push(`FromBankAccount.Name=="${filter.fromBankAccountNameValue}"`);
+											}
+											break;
+										case 'ToBankAccount.Name':
+											if (filter.toBankAccountNameValue) {
+												whereParts.push(`ToBankAccount.Name=="${filter.toBankAccountNameValue}"`);
+											}
+											break;
+									}
+								}
+								whereClause = whereParts.join(' && ');
+							}
+						}
+						
+						if (whereClause) {
+							qs.where = whereClause;
+						}
+
+						// Handle If-Modified-Since header
+						if (options['If-Modified-Since']) {
+							headers['If-Modified-Since'] = options['If-Modified-Since'] as string;
+						}
+
+						responseData = await xeroApiRequest.call(
+							this,
+							'GET',
+							'/BankTransfers',
+							{ organizationId },
+							qs,
+							undefined,
+							headers,
+						);
+						responseData = responseData.BankTransfers;
+					}
+				}
+
+				// HISTORY AND NOTES
+				if (resource === 'historyandnotes') {
+					if (operation === 'addNote') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const endpoint = this.getNodeParameter('endpoint', i) as string;
+						const guid = this.getNodeParameter('guid', i) as string;
+						const note = this.getNodeParameter('note', i) as string;
+
+						const body: IDataObject = {
+							organizationId,
+							HistoryRecords: [
+								{
+									Details: note,
+								},
+							],
+						};
+
+						responseData = await xeroApiRequest.call(this, 'PUT', `/${endpoint}/${guid}/history`, body);
+						responseData = responseData.HistoryRecords;
+					}
+					if (operation === 'getNotes') {
+						const organizationId = this.getNodeParameter('organizationId', i) as string;
+						const endpoint = this.getNodeParameter('endpoint', i) as string;
+						const guid = this.getNodeParameter('guid', i) as string;
+
+						responseData = await xeroApiRequest.call(
+							this,
+							'GET',
+							`/${endpoint}/${guid}/history`,
+							{ organizationId },
+						);
+						responseData = responseData.HistoryRecords;
+					}
 				}
 
 				// If routing already resolved the request, return what n8n put on the item

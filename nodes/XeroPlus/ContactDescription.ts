@@ -125,7 +125,7 @@ export const contactFields: INodeProperties[] = [
 										value: 'STREET',
 									},
 								],
-								default: '',
+								default: 'POBOX',
 							},
 							{
 								displayName: 'Line 1',
@@ -209,7 +209,7 @@ export const contactFields: INodeProperties[] = [
 						description: 'The Contact is the subject of a GDPR erasure request',
 					},
 				],
-				default: '',
+				default: 'ACTIVE',
 				description: 'Current status of a contact - see contact status types',
 			},
 			{
@@ -276,7 +276,7 @@ export const contactFields: INodeProperties[] = [
 										value: 'FAX',
 									},
 								],
-								default: '',
+								default: 'DEFAULT',
 							},
 							{
 								displayName: 'Number',
@@ -452,6 +452,15 @@ export const contactFields: INodeProperties[] = [
 				default: '',
 				description: 'Order by any element returned',
 			},
+			// New parameters/options added to the node
+			{
+				displayName: 'Search Term',
+				name: 'searchTerm',
+				type: 'string',
+				placeholder: '',
+				default: '',
+				description: 'Search parameter that performs a case-insensitive text search across the fields: Name, FirstName, LastName, ContactNumber, CompanyNumber, EmailAddress',
+			},
 			{
 				displayName: 'Sort Order',
 				name: 'sortOrder',
@@ -466,7 +475,14 @@ export const contactFields: INodeProperties[] = [
 						value: 'DESC',
 					},
 				],
-				default: '',
+				default: 'ASC',
+			},
+			{
+				displayName: 'Summary Only', 
+				name: 'summaryOnly',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to return lightweight fields, excluding computation-heavy fields from the response, making the API calls quick and efficient',
 			},
 			{
 				displayName: 'Where',
@@ -476,24 +492,6 @@ export const contactFields: INodeProperties[] = [
 				default: '',
 				description:
 					'The where parameter allows you to filter on endpoints and elements that don\'t have explicit parameters. <a href="https://developer.xero.com/documentation/api/requests-and-responses#get-modified">Examples Here</a>.',
-			},
-			// New parameters/options added to the node
-			{
-				displayName: 'Summary Only', 
-				name: 'summaryOnly',
-				type: 'boolean',
-				default: false,
-				description:
-					'When set to true, this returns lightweight fields, excluding computation-heavy fields from the response, making the API calls quick and efficient.',
-			},
-			{
-				displayName: 'Search Term',
-				name: 'searchTerm',
-				type: 'string',
-				placeholder: '',
-				default: '',
-				description:
-					'	Search parameter that performs a case-insensitive text search across the fields: Name, FirstName, LastName, ContactNumber, CompanyNumber, EmailAddress.',
 			},
 		],
 	},
@@ -579,7 +577,7 @@ export const contactFields: INodeProperties[] = [
 										value: 'STREET',
 									},
 								],
-								default: '',
+								default: 'POBOX',
 							},
 							{
 								displayName: 'Line 1',
@@ -663,7 +661,7 @@ export const contactFields: INodeProperties[] = [
 						description: 'The Contact is the subject of a GDPR erasure request',
 					},
 				],
-				default: '',
+				default: 'ACTIVE',
 				description: 'Current status of a contact - see contact status types',
 			},
 			{
@@ -737,7 +735,7 @@ export const contactFields: INodeProperties[] = [
 										value: 'FAX',
 									},
 								],
-								default: '',
+								default: 'DEFAULT',
 							},
 							{
 								displayName: 'Number',

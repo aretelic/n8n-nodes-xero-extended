@@ -19,6 +19,12 @@ export const accountsOperations: INodeProperties[] = [
 				action: 'Create a account',
 			},
 			{
+				name: 'Delete',
+				value: 'delete',
+				description: 'Delete a account',
+				action: 'Delete a account',
+			},
+			{
 				name: 'Get',
 				value: 'get',
 				description: 'Get a account',
@@ -35,12 +41,6 @@ export const accountsOperations: INodeProperties[] = [
 				value: 'update',
 				description: 'Update a account',
 				action: 'Update a account',
-			},
-			{
-				name: 'Delete',
-				value: 'delete',
-				description: 'Delete a account',
-				action: 'Delete a account',
 			},
 		],
 		default: 'create',
@@ -88,14 +88,14 @@ export const accountsFields: INodeProperties[] = [
         name: 'type',
         type: 'options',
         options: [
-            { name: 'Sales', value: 'SALES' },
-            { name: 'Current Asset', value: 'CURRENT' },
             { name: 'Bank', value: 'BANK' },
-            { name: 'Expense', value: 'EXPENSE' },
-            { name: 'Liability', value: 'LIABILITY' },
+            { name: 'Current Asset', value: 'CURRENT' },
             { name: 'Equity', value: 'EQUITY' },
+            { name: 'Expense', value: 'EXPENSE' },
             { name: 'Fixed Asset', value: 'FIXED' },
+            { name: 'Liability', value: 'LIABILITY' },
             { name: 'Revenue', value: 'REVENUE' },
+            { name: 'Sales', value: 'SALES' },
         ],
         default: 'SALES',
         description: 'Account type. See Xero documentation for the full list of types.',
@@ -125,7 +125,7 @@ export const accountsFields: INodeProperties[] = [
         name: 'bankAccountNumber',
         type: 'string',
         default: '',
-        description: 'For bank accounts only (Account Type BANK).',
+        description: 'For bank accounts only (Account Type BANK)',
         displayOptions: {
             show: {
                 resource: ['accounts'],
@@ -147,25 +147,6 @@ export const accountsFields: INodeProperties[] = [
         },
         options: [
             {
-                displayName: 'Status',
-                name: 'status',
-                type: 'options',
-                options: [
-                    { name: 'Active', value: 'ACTIVE' },
-                    { name: 'Archived', value: 'ARCHIVED' },
-                ],
-                default: '',
-                description: 'Account status.',
-            },
-            {
-                displayName: 'Description',
-                name: 'description',
-                type: 'string',
-                typeOptions: { rows: 4 },
-                default: '',
-                description: 'Description of the account (max length = 4000).',
-            },
-            {
                 displayName: 'Bank Account Type',
                 name: 'bankAccountType',
                 type: 'options',
@@ -175,8 +156,8 @@ export const accountsFields: INodeProperties[] = [
                     { name: 'PayPal', value: 'PAYPAL' },
                     { name: 'Other', value: 'OTHER' },
                 ],
-                default: '',
-                description: 'For bank accounts only.',
+                default: 'BANK',
+                description: 'For bank accounts only',
             },
             {
                 displayName: 'Currency Code',
@@ -186,11 +167,12 @@ export const accountsFields: INodeProperties[] = [
                 description: 'ISO currency code. For bank accounts only.',
             },
             {
-                displayName: 'Tax Type',
-                name: 'taxType',
+                displayName: 'Description',
+                name: 'description',
                 type: 'string',
+                typeOptions: { rows: 4 },
                 default: '',
-                description: 'Tax type to apply to this account.',
+                description: 'Description of the account (max length = 4000)',
             },
             {
                 displayName: 'Enable Payments To Account',
@@ -203,6 +185,24 @@ export const accountsFields: INodeProperties[] = [
                 name: 'showInExpenseClaims',
                 type: 'boolean',
                 default: false,
+            },
+            {
+                displayName: 'Status',
+                name: 'status',
+                type: 'options',
+                options: [
+                    { name: 'Active', value: 'ACTIVE' },
+                    { name: 'Archived', value: 'ARCHIVED' },
+                ],
+                default: 'ACTIVE',
+                description: 'Account status',
+            },
+            {
+                displayName: 'Tax Type',
+                name: 'taxType',
+                type: 'string',
+                default: '',
+                description: 'Tax type to apply to this account',
             },
         ],
     },
@@ -231,9 +231,9 @@ export const accountsFields: INodeProperties[] = [
         displayName: 'Account Name or ID',
         name: 'accountId',
         type: 'options',
-        description: 'Choose from the list, or specify an ID using an expression.',
+        description: 'Choose from the list, or specify an ID using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
         typeOptions: {
-            loadOptionsMethod: 'getAccounts',
+            loadOptionsMethod: 'getAccountCodes',
             loadOptionsDependsOn: ['organizationId'],
         },
         default: '',
@@ -278,73 +278,35 @@ export const accountsFields: INodeProperties[] = [
 				operation: ['getAll'],
 			},
 		},
+		// eslint-disable-next-line n8n-nodes-base/node-param-collection-type-unsorted-items
 		options: [
 			{
 				displayName: 'Modified After',
 				name: 'If-Modified-Since',
 				type: 'dateTime',
 				default: '',
-				description: 'Date and time to filter for accounts modified after this date and time.',
+				description: 'Date and time to filter for accounts modified after this date and time',
 			},
 			{
 				displayName: 'Order By',
 				name: 'orderBy',
 				type: 'options',
 				options: [
-					{
-						name: 'AccountID',
-						value: 'AccountID',
-					},
-					{
-						name: 'Code',
-						value: 'Code',
-					},
-					{
-						name: 'Name',
-						value: 'Name',
-					},
-					{
-						name: 'Type',
-						value: 'Type',
-					},
-					{
-						name: 'Status',
-						value: 'Status',
-					},
-					{
-						name: 'Description',
-						value: 'Description',
-					},
-					{
-						name: 'Bank Account Type',
-						value: 'BankAccountType',
-					},
-					{
-						name: 'Tax Type',
-						value: 'TaxType',
-					},
-					{
-						name: 'Enable Payments To Account',
-						value: 'EnablePaymentsToAccount',
-					},
-					{
-						name: 'Show In Expense Claims',
-						value: 'ShowInExpenseClaims',
-					},
-					{
-						name: 'Class',
-						value: 'Class',
-					},
-					{
-						name: 'System Account',
-						value: 'SystemAccount',
-					},
-					{
-						name: 'Updated Date',
-						value: 'UpdatedDateUTC',
-					},
+					{ name: 'AccountID', value: 'AccountID' },
+					{ name: 'Bank Account Type', value: 'BankAccountType' },
+					{ name: 'Class', value: 'Class' },
+					{ name: 'Code', value: 'Code' },
+					{ name: 'Description', value: 'Description' },
+					{ name: 'Enable Payments To Account', value: 'EnablePaymentsToAccount' },
+					{ name: 'Name', value: 'Name' },
+					{ name: 'Show In Expense Claims', value: 'ShowInExpenseClaims' },
+					{ name: 'Status', value: 'Status' },
+					{ name: 'System Account', value: 'SystemAccount' },
+					{ name: 'Tax Type', value: 'TaxType' },
+					{ name: 'Type', value: 'Type' },
+					{ name: 'Updated Date', value: 'UpdatedDateUTC' },
 				],
-				default: '',
+				default: 'AccountID',
 				description: 'Order by any element returned',
 			},
 			{
@@ -352,16 +314,10 @@ export const accountsFields: INodeProperties[] = [
 				name: 'sortOrder',
 				type: 'options',
 				options: [
-					{
-						name: 'Asc',
-						value: 'ASC',
-					},
-					{
-						name: 'Desc',
-						value: 'DESC',
-					},
+					{ name: 'Asc', value: 'ASC' },
+					{ name: 'Desc', value: 'DESC' },
 				],
-				default: '',
+				default: 'ASC',
 			},
 			{
 				displayName: 'Where Filters',
@@ -379,169 +335,291 @@ export const accountsFields: INodeProperties[] = [
 						displayName: 'Filter',
 						values: [
 							{
-								displayName: 'Field',
-								name: 'field',
-								type: 'options',
-								options: [
-									{ name: 'Type', value: 'Type' },
-									{ name: 'Class', value: 'Class' },
-									{ name: 'Status', value: 'Status' },
-									{ name: 'Bank Account Type', value: 'BankAccountType' },
-									{ name: 'Tax Type', value: 'TaxType' },
-									{ name: 'Enable Payments To Account', value: 'EnablePaymentsToAccount' },
-									{ name: 'System Account', value: 'SystemAccount' },
-									{ name: 'Accounts on Watchlist', value: 'AddToWatchlist' },
+						displayName: 'Accounts on Watchlist',
+						name: 'AddToWatchlist',
+						type: 'boolean',
+						default: false,
+							},
+							{
+						displayName: 'Bank Account Type',
+						name: 'bankAccountTypeValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Bank',
+										value: 'BANK',
+									},
+									{
+										name: 'Credit Card',
+										value: 'CREDITCARD',
+									},
+									{
+										name: 'PayPal',
+										value: 'PAYPAL',
+									},
+									{
+										name: 'Other',
+										value: 'OTHER',
+									},
 								],
-								default: 'Type',
-								description: 'Field to filter on',
+						default: 'BANK',
 							},
 							{
-								displayName: 'Type',
-								name: 'typeValue',
-								type: 'options',
-								options: [
-									{ name: 'Bank', value: 'BANK' },
-									{ name: 'Current Asset', value: 'CURRENT' },
-									{ name: 'Current Liability', value: 'CURRLIAB' },
-									{ name: 'Depreciation', value: 'DEPRECIATN' },
-									{ name: 'Direct Costs', value: 'DIRECTCOSTS' },
-									{ name: 'Equity', value: 'EQUITY' },
-									{ name: 'Expense', value: 'EXPENSE' },
-									{ name: 'Fixed Asset', value: 'FIXED' },
-									{ name: 'Inventory', value: 'INVENTORY' },
-									{ name: 'Liability', value: 'LIABILITY' },
-									{ name: 'Non-Current Asset', value: 'NONCURRENT' },
-									{ name: 'Other Income', value: 'OTHERINCOME' },
-									{ name: 'Overhead', value: 'OVERHEADS' },
-									{ name: 'Prepayment', value: 'PREPAYMENT' },
-									{ name: 'Revenue', value: 'REVENUE' },
-									{ name: 'Sales', value: 'SALES' },
-									{ name: 'Term Liability', value: 'TERMLIAB' },
-								],
-								default: 'BANK',
-								displayOptions: {
-									show: {
-										field: ['Type'],
+						displayName: 'Class',
+						name: 'classValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Asset',
+										value: 'ASSET',
 									},
-								},
+									{
+										name: 'Equity',
+										value: 'EQUITY',
+									},
+									{
+										name: 'Expense',
+										value: 'EXPENSE',
+									},
+									{
+										name: 'Liability',
+										value: 'LIABILITY',
+									},
+									{
+										name: 'Revenue',
+										value: 'REVENUE',
+									},
+					],
+						default: 'ASSET',
 							},
 							{
-								displayName: 'Class',
-								name: 'classValue',
-								type: 'options',
-								options: [
-									{ name: 'Asset', value: 'ASSET' },
-									{ name: 'Equity', value: 'EQUITY' },
-									{ name: 'Expense', value: 'EXPENSE' },
-									{ name: 'Liability', value: 'LIABILITY' },
-									{ name: 'Revenue', value: 'REVENUE' },
-								],
-								default: 'ASSET',
-								displayOptions: {
-									show: {
-										field: ['Class'],
-									},
-								},
+						displayName: 'Enable Payments To Account',
+						name: 'enablePaymentsValue',
+						type: 'boolean',
+						default: false,
 							},
 							{
-								displayName: 'Status',
-								name: 'statusValue',
-								type: 'options',
-								options: [
-									{ name: 'Active', value: 'ACTIVE' },
-									{ name: 'Archived', value: 'ARCHIVED' },
-								],
-								default: 'ACTIVE',
-								displayOptions: {
-									show: {
-										field: ['Status'],
+						displayName: 'Field',
+						name: 'field',
+						type: 'options',
+						options: [
+									{
+										name: 'Accounts on Watchlist',
+										value: 'AddToWatchlist',
 									},
-								},
+									{
+										name: 'Bank Account Type',
+										value: 'BankAccountType',
+									},
+									{
+										name: 'Class',
+										value: 'Class',
+									},
+									{
+										name: 'Enable Payments To Account',
+										value: 'EnablePaymentsToAccount',
+									},
+									{
+										name: 'Status',
+										value: 'Status',
+									},
+									{
+										name: 'System Account',
+										value: 'SystemAccount',
+									},
+									{
+										name: 'Tax Type',
+										value: 'TaxType',
+									},
+									{
+										name: 'Type',
+										value: 'Type',
+									},
+					],
+						default: 'Type',
+						description: 'Field to filter on',
 							},
 							{
-								displayName: 'Bank Account Type',
-								name: 'bankAccountTypeValue',
-								type: 'options',
-								options: [
-									{ name: 'Bank', value: 'BANK' },
-									{ name: 'Credit Card', value: 'CREDITCARD' },
-									{ name: 'PayPal', value: 'PAYPAL' },
-									{ name: 'Other', value: 'OTHER' },
-								],
-								default: 'BANK',
-								displayOptions: {
-									show: {
-										field: ['BankAccountType'],
+						displayName: 'Status',
+						name: 'statusValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Active',
+										value: 'ACTIVE',
 									},
-								},
+									{
+										name: 'Archived',
+										value: 'ARCHIVED',
+									},
+					],
+						default: 'ACTIVE',
 							},
 							{
-								displayName: 'Tax Type',
-								name: 'taxTypeValue',
-								type: 'string',
-								default: '',
-								placeholder: 'INPUT, OUTPUT, NONE, etc.',
-								description: 'Tax type code',
-								displayOptions: {
-									show: {
-										field: ['TaxType'],
+						displayName: 'System Account',
+						name: 'systemAccountValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Accounts Payable',
+										value: 'CREDITORS',
 									},
-								},
+									{
+										name: 'Accounts Receivable',
+										value: 'DEBTORS',
+									},
+									{
+										name: 'Bank Revaluations',
+										value: 'BANKCURRENCYGAIN',
+									},
+									{
+										name: 'CIS Assets (UK Only)',
+										value: 'CISASSETS',
+									},
+									{
+										name: 'CIS Labour Expense (UK Only)',
+										value: 'CISLABOUREXPENSE',
+									},
+									{
+										name: 'CIS Labour Income (UK Only)',
+										value: 'CISLABOURINCOME',
+									},
+									{
+										name: 'CIS Liability (UK Only)',
+										value: 'CISLIABILITY',
+									},
+									{
+										name: 'CIS Materials (UK Only)',
+										value: 'CISMATERIALS',
+									},
+									{
+										name: 'GST	/	VAT',
+										value: 'GST',
+									},
+									{
+										name: 'GST On Imports',
+										value: 'GSTONIMPORTS',
+									},
+									{
+										name: 'Historical Adjustment',
+										value: 'HISTORICAL',
+									},
+									{
+										name: 'Realised Currency Gains',
+										value: 'REALISEDCURRENCYGAIN',
+									},
+									{
+										name: 'Retained Earnings',
+										value: 'RETAINEDEARNINGS',
+									},
+									{
+										name: 'Rounding',
+										value: 'ROUNDING',
+									},
+									{
+										name: 'Tracking Transfers',
+										value: 'TRACKINGTRANSFERS',
+									},
+									{
+										name: 'Unpaid Expense Claims',
+										value: 'UNPAIDEXPCLM',
+									},
+									{
+										name: 'Unrealised Currency Gains',
+										value: 'UNREALISEDCURRENCYGAIN',
+									},
+									{
+										name: 'Wages Payable',
+										value: 'WAGEPAYABLES',
+									},
+					],
+						default: 'DEBTORS',
 							},
 							{
-								displayName: 'Enable Payments To Account',
-								name: 'enablePaymentsValue',
-								type: 'boolean',
-								default: false,
-								displayOptions: {
-									show: {
-										field: ['EnablePaymentsToAccount'],
-									},
-								},
+						displayName: 'Tax Type',
+						name: 'taxTypeValue',
+						type: 'string',
+						default: '',
+						placeholder: 'INPUT, OUTPUT, NONE, etc.',
+						description: 'Tax type code',
 							},
 							{
-								displayName: 'System Account',
-								name: 'systemAccountValue',
-								type: 'options',
-								options: [
-									{ name: 'Accounts Receivable', value: 'DEBTORS' },
-									{ name: 'Accounts Payable', value: 'CREDITORS' },
-									{ name: 'Bank Revaluations', value: 'BANKCURRENCYGAIN' },
-									{ name: 'CIS Assets (UK Only)', value: 'CISASSETS' },
-									{ name: 'CIS Labour Expense (UK Only)', value: 'CISLABOUREXPENSE' },
-									{ name: 'CIS Labour Income (UK Only)', value: 'CISLABOURINCOME' },
-									{ name: 'CIS Liability (UK Only)', value: 'CISLIABILITY' },
-									{ name: 'CIS Materials (UK Only)', value: 'CISMATERIALS' },
-									{ name: 'GST / VAT', value: 'GST' },
-									{ name: 'GST On Imports', value: 'GSTONIMPORTS' },
-									{ name: 'Historical Adjustment', value: 'HISTORICAL' },
-									{ name: 'Realised Currency Gains', value: 'REALISEDCURRENCYGAIN' },
-									{ name: 'Retained Earnings', value: 'RETAINEDEARNINGS' },
-									{ name: 'Rounding', value: 'ROUNDING' },
-									{ name: 'Tracking Transfers', value: 'TRACKINGTRANSFERS' },
-									{ name: 'Unpaid Expense Claims', value: 'UNPAIDEXPCLM' },
-									{ name: 'Unrealised Currency Gains', value: 'UNREALISEDCURRENCYGAIN' },
-									{ name: 'Wages Payable', value: 'WAGEPAYABLES' },
-								],
-								default: 'DEBTORS',
-								displayOptions: {
-									show: {
-										field: ['SystemAccount'],
+						displayName: 'Type',
+						name: 'typeValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Bank',
+										value: 'BANK',
 									},
-								},
-							},
-							{
-								displayName: 'Accounts on Watchlist',
-								name: 'AddToWatchlist',
-								type: 'boolean',
-								default: false,
-								displayOptions: {
-									show: {
-										field: ['AddToWatchlist'],
+									{
+										name: 'Current Asset',
+										value: 'CURRENT',
 									},
-								},
+									{
+										name: 'Current Liability',
+										value: 'CURRLIAB',
+									},
+									{
+										name: 'Depreciation',
+										value: 'DEPRECIATN',
+									},
+									{
+										name: 'Direct Costs',
+										value: 'DIRECTCOSTS',
+									},
+									{
+										name: 'Equity',
+										value: 'EQUITY',
+									},
+									{
+										name: 'Expense',
+										value: 'EXPENSE',
+									},
+									{
+										name: 'Fixed Asset',
+										value: 'FIXED',
+									},
+									{
+										name: 'Inventory',
+										value: 'INVENTORY',
+									},
+									{
+										name: 'Liability',
+										value: 'LIABILITY',
+									},
+									{
+										name: 'Non-Current Asset',
+										value: 'NONCURRENT',
+									},
+									{
+										name: 'Other Income',
+										value: 'OTHERINCOME',
+									},
+									{
+										name: 'Overhead',
+										value: 'OVERHEADS',
+									},
+									{
+										name: 'Prepayment',
+										value: 'PREPAYMENT',
+									},
+									{
+										name: 'Revenue',
+										value: 'REVENUE',
+									},
+									{
+										name: 'Sales',
+										value: 'SALES',
+									},
+									{
+										name: 'Term Liability',
+										value: 'TERMLIAB',
+									},
+					],
+						default: 'BANK',
 							},
-						],
+					],
 					},
 				],
 			},
@@ -555,9 +633,6 @@ export const accountsFields: INodeProperties[] = [
 			},
 		],
 	},
-    /* -------------------------------------------------------------------------- */
-    /*                                accounts:update                              */
-    /* -------------------------------------------------------------------------- */
     {
         displayName: 'Organization Name or ID',
         name: 'organizationId',
@@ -580,9 +655,9 @@ export const accountsFields: INodeProperties[] = [
         displayName: 'Account Name or ID',
         name: 'accountId',
         type: 'options',
-        description: 'Choose from the list, or specify an ID using an expression.',
+        description: 'Choose from the list, or specify an ID using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
         typeOptions: {
-            loadOptionsMethod: 'getAccounts',
+            loadOptionsMethod: 'getAccountCodes',
             loadOptionsDependsOn: ['organizationId'],
         },
         default: '',
@@ -607,62 +682,26 @@ export const accountsFields: INodeProperties[] = [
             },
         },
         options: [
-			{
-				displayName: 'Name',
-				name: 'name',
-				type: 'string',
-				default: '',
-				description: 'Name of the account (max length = 150)',
-			},
-			{
-				displayName: 'Code',
-				name: 'code',
-				type: 'string',
-				default: '',
-				description: 'Alpha-numeric account code (max length = 10). Required unless Type is BANK.',
-			},
-			{
-				displayName: 'Type',
-				name: 'type',
-				type: 'options',
-				options: [
-					{ name: 'Sales', value: 'SALES' },
-					{ name: 'Current Asset', value: 'CURRENT' },
-					{ name: 'Bank', value: 'BANK' },
-					{ name: 'Expense', value: 'EXPENSE' },
-					{ name: 'Liability', value: 'LIABILITY' },
-					{ name: 'Equity', value: 'EQUITY' },
-					{ name: 'Fixed Asset', value: 'FIXED' },
-					{ name: 'Revenue', value: 'REVENUE' },
-				],
-				default: '',
-				description: 'Account type. See Xero documentation for the full list of types.',
-			},
-			{
-				displayName: 'Bank Account Number',
-				name: 'bankAccountNumber',
-				type: 'string',
-				default: '',
-				description: 'For bank accounts only (Account Type BANK).',
-			},
             {
-                displayName: 'Status',
-                name: 'status',
-                type: 'options',
-                options: [
-                    { name: 'Active', value: 'ACTIVE' },
-                    { name: 'Archived', value: 'ARCHIVED' },
-                ],
-                default: '',
-                description: 'Account status.',
+                displayName: 'Add To Watchlist',
+                name: 'AddToWatchlist',
+                type: 'boolean',
+                default: false,
+                description: 'Whether this account is to be shown in the Xero dashboard watchlist widget',
             },
             {
-                displayName: 'Description',
-                name: 'description',
+                displayName: 'Bank Account Number',
+                name: 'bankAccountNumber',
                 type: 'string',
-                typeOptions: { rows: 4 },
                 default: '',
-                description: 'Description of the account (max length = 4000).',
+                description: 'For bank accounts only (Account Type BANK)',
+            },
+            {
+                displayName: 'Code',
+                name: 'code',
+                type: 'string',
+                default: '',
+                description: 'Alpha-numeric account code (max length = 10). Required unless Type is BANK.',
             },
             {
                 displayName: 'Currency Code',
@@ -672,11 +711,12 @@ export const accountsFields: INodeProperties[] = [
                 description: 'ISO currency code. For bank accounts only.',
             },
             {
-                displayName: 'Tax Type',
-                name: 'taxType',
+                displayName: 'Description',
+                name: 'description',
                 type: 'string',
+                typeOptions: { rows: 4 },
                 default: '',
-                description: 'Tax type to apply to this account.',
+                description: 'Description of the account (max length = 4000)',
             },
             {
                 displayName: 'Enable Payments To Account',
@@ -685,18 +725,53 @@ export const accountsFields: INodeProperties[] = [
                 default: false,
             },
             {
+                displayName: 'Name',
+                name: 'name',
+                type: 'string',
+                default: '',
+                description: 'Name of the account (max length = 150)',
+            },
+            {
                 displayName: 'Show In Expense Claims',
                 name: 'showInExpenseClaims',
                 type: 'boolean',
                 default: false,
             },
-			{
-				displayName: 'Add To Watchlist',
-				name: 'AddToWatchlist',
-				type: 'boolean',
-				default: false,
-				description: 'Determines if this account is to be shown in the Xero dashboard watchlist widget.',
-			},
+            {
+                displayName: 'Status',
+                name: 'status',
+                type: 'options',
+                options: [
+                    { name: 'Active', value: 'ACTIVE' },
+                    { name: 'Archived', value: 'ARCHIVED' },
+                ],
+                default: 'ACTIVE',
+                description: 'Account status',
+            },
+            {
+                displayName: 'Tax Type',
+                name: 'taxType',
+                type: 'string',
+                default: '',
+                description: 'Tax type to apply to this account',
+            },
+            {
+                displayName: 'Type',
+                name: 'type',
+                type: 'options',
+                options: [
+                    { name: 'Bank', value: 'BANK' },
+                    { name: 'Current Asset', value: 'CURRENT' },
+                    { name: 'Equity', value: 'EQUITY' },
+                    { name: 'Expense', value: 'EXPENSE' },
+                    { name: 'Fixed Asset', value: 'FIXED' },
+                    { name: 'Liability', value: 'LIABILITY' },
+                    { name: 'Revenue', value: 'REVENUE' },
+                    { name: 'Sales', value: 'SALES' },
+                ],
+                default: 'SALES',
+                description: 'Account type. See Xero documentation for the full list of types.',
+            },
         ],
     },	
 	/* -------------------------------------------------------------------------- */
@@ -724,9 +799,9 @@ export const accountsFields: INodeProperties[] = [
         displayName: 'Account Name or ID',
         name: 'accountId',
         type: 'options',
-        description: 'Choose from the list, or specify an ID using an expression.',
+        description: 'Choose from the list, or specify an ID using an expression. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
         typeOptions: {
-            loadOptionsMethod: 'getAccounts',
+            loadOptionsMethod: 'getAccountCodes',
             loadOptionsDependsOn: ['organizationId'],
         },
         default: '',

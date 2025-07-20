@@ -18,6 +18,7 @@ export class XeroPlusOAuth2Api implements ICredentialType {
 
 	displayName = 'Xero+ OAuth2 API';
 
+	// eslint-disable-next-line n8n-nodes-base/cred-class-field-documentation-url-not-http-url
 	documentationUrl = 'xero';
 
 	properties: INodeProperties[] = [

@@ -1,48 +1,196 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-xero-plus
 
-# n8n-nodes-starter
+[![npm version](https://badge.fury.io/js/n8n-nodes-xero-plus.svg)](https://badge.fury.io/js/n8n-nodes-xero-plus)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+An enhanced Xero integration for n8n that extends the standard Xero node with additional resources and improved functionality.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+## Features
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+This node provides enhanced functionality for Xero integration, including additional resources and quality-of-life improvements that go beyond the standard Xero node.
 
-## Prerequisites
+## Resources
 
-You need the following installed on your development machine:
+### 📞 Contacts
+Enhanced contact management with improved search and performance options:
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+- **Get Contact** - Retrieve a single contact with optional summary mode
+- **Get Many Contacts** - Retrieve multiple contacts with enhanced search capabilities
+- **Create Contact** - Create new contacts
+- **Update Contact** - Update existing contacts
+- **Delete Contact** - Remove contacts
 
-## Using this starter
+**Improvements:**
+- ✅ **Summary Only Option** - Returns lightweight responses for faster execution
+- ✅ **Enhanced Search** - Case-insensitive text search across Name, FirstName, LastName, ContactNumber, CompanyNumber, and EmailAddress fields
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+### 🧾 Invoices
+Comprehensive invoice management with enhanced functionality:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
+- **Get Invoice** - Retrieve a single invoice with optional summary mode
+- **Get Many Invoices** - Retrieve multiple invoices with search capabilities
+- **Create Invoice** - Create new invoices
+- **Update Invoice** - Update existing invoices
+- **Delete Invoice** - Remove invoices
+
+**Improvements:**
+- ✅ **Summary Only Option** - Returns lightweight responses for faster execution
+- ✅ **Enhanced Search** - Case-insensitive text search across invoice fields
+- ✅ **Contact Selection** - Dropdown to select contacts by name with fallback to ContactID via expression
+
+### 🏢 Organisations
+Manage organization information and connections:
+
+- **Get Connected Organisations** - Retrieve list of connected organizations
+- **Get Organisation Details** - Get detailed organization information
+
+### 📎 Attachments
+Complete attachment management for all transaction types:
+
+- **Upload Attachment** - Upload files to any transaction (Invoices, Bills, Bank Transactions, etc.)
+- **Get Attachments** - Retrieve list of attachments for a transaction
+- **Get Attachment** - Download specific attachment files
+
+### 💰 Accounts
+Full account management capabilities:
+
+- **Create Account** - Create new chart of accounts entries
+- **Get Account** - Retrieve specific account details
+- **Get Many Accounts** - Retrieve multiple accounts with filtering
+- **Update Account** - Modify existing accounts
+- **Delete Account** - Remove accounts
+
+**Quality of Life Improvements:**
+- ✅ **Enhanced Filtering** - Click-and-select filters for easier "Get All" result filtering
+
+### 📊 Reports
+Comprehensive reporting capabilities:
+
+- **Get 1099 Report** - Retrieve 1099 tax reports
+- **Get Balance Sheet Report** - Access balance sheet data
+- **Get Budget Summary Report** - Retrieve budget information
+- **Get Profit and Loss Report** - Access P&L statements
+
+**Quality of Life Improvements:**
+- ✅ **User-Friendly Formatting** - Compact, readable format for Balance Sheet, Budget Summary, Profit and Loss, and Trial Balance reports
+
+### 🏦 Bank Transactions
+Complete bank transaction management:
+
+- **Create Bank Transaction** - Create new bank transactions
+- **Get Bank Transactions** - Retrieve transaction history
+- **Update Bank Transaction** - Modify existing transactions
+- **Delete Bank Transaction** - Remove transactions
+
+### 💸 Bank Transfers
+Manage bank transfers between accounts:
+
+- **Create Bank Transfer** - Create transfers between bank accounts
+- **Get Bank Transfers** - Retrieve transfer history
+- **Update Bank Transfer** - Modify existing transfers
+- **Delete Bank Transfer** - Remove transfers
+
+### 📝 History and Notes
+Track changes and manage notes:
+
+- **Get History** - Retrieve transaction history
+- **Get Notes** - Access notes for transactions
+- **Create Note** - Add new notes
+- **Update Note** - Modify existing notes
+- **Delete Note** - Remove notes
+
+## Installation
+
+### For n8n Cloud users
+
+This node is available on n8n Cloud. You can find it in the node library under "Xero +".
+
+### For self-hosted n8n users
+
+1. Install the package in your n8n installation:
+   ```bash
+   npm install n8n-nodes-xero-plus
    ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
 
-## More information
+2. Restart your n8n instance
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+3. The "Xero +" node will now be available in your node library
+
+## Setup
+
+1. Add the "Xero +" node to your workflow
+2. Create a new Xero OAuth2 credential or use an existing one
+3. Select the resource you want to work with
+4. Configure the operation and parameters as needed
+
+## Credentials
+
+This node uses the same Xero OAuth2 credentials as the standard Xero node. You can use your existing Xero credentials or create new ones following the [Xero API documentation](https://developer.xero.com/app/).
+
+## Usage Examples
+
+### Get Contacts with Search
+Use the enhanced search functionality to find contacts by name, email, or other fields:
+
+```javascript
+// Search for contacts containing "john" in any searchable field
+{
+  "resource": "contact",
+  "operation": "getMany",
+  "search": "john"
+}
+```
+
+### Get Invoices with Summary
+Retrieve lightweight invoice data for faster processing:
+
+```javascript
+// Get invoice summary only
+{
+  "resource": "invoice",
+  "operation": "get",
+  "summaryOnly": true
+}
+```
+
+### Upload Attachment to Invoice
+Attach files to any transaction type:
+
+```javascript
+// Upload a file to an invoice
+{
+  "resource": "attachments",
+  "operation": "upload",
+  "transactionType": "Invoice",
+  "transactionId": "{{$json.InvoiceID}}",
+  "fileName": "receipt.pdf",
+  "fileData": "{{$binary.data}}"
+}
+```
+
+## Version History
+
+### v1.0.1
+- Enhanced Contacts and Invoices with summary options and search functionality
+- Added comprehensive Organisations, Attachments, Accounts, Reports, Bank Transactions, Bank Transfers, and History and Notes resources
+- Improved user experience with dropdown selections and enhanced filtering
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+[MIT](LICENSE)
+
+## Support
+
+For support, please open an issue on the [GitHub repository](https://github.com/Mad-Man-Dan/n8n-nodes-xero-plus).
+
+## Author
+
+**Daniel Fonseca** - [daniel@appvisory.dev](mailto:daniel@appvisory.dev)
+
+---
+
+Built with ❤️ for the n8n community

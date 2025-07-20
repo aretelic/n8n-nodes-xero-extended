@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-xero-plus",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "Xero node for n8n with additional features beyond the standard Xero node",
   "keywords": [
     "n8n-community-node-package"
@@ -8,12 +8,12 @@
   "license": "MIT",
   "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Daniel Fonseca",
+    "email": "daniel@appvisory.dev"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "https://github.com/Mad-Man-Dan/n8n-nodes-xero-plus.git"
   },
   "engines": {
     "node": ">=20.15"
@@ -36,7 +36,7 @@
       "dist/credentials/XeroPlusOAuth2Api.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/XeroPlus/XeroPlus.node.js"
+      "dist/nodes/XeroPlus/Xeroplus.node.js"
     ]
   },
   "devDependencies": {

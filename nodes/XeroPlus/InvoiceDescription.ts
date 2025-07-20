@@ -79,7 +79,7 @@ export const invoiceFields: INodeProperties[] = [
 				description: 'Accounts Receivable or customer invoice',
 			},
 		],
-		default: '',
+		default: 'ACCPAY',
 		displayOptions: {
 			show: {
 				resource: ['invoice'],
@@ -90,9 +90,15 @@ export const invoiceFields: INodeProperties[] = [
 		description: 'Invoice Type',
 	},
 	{
-		displayName: 'Contact ID',
+		displayName: 'Contact Name or ID',
 		name: 'contactId',
-		type: 'string',
+		type: 'options',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		typeOptions: {
+			loadOptionsMethod: 'getContacts',
+			loadOptionsDependsOn: ['organizationId'],
+		},
 		default: '',
 		displayOptions: {
 			show: {
@@ -124,6 +130,13 @@ export const invoiceFields: INodeProperties[] = [
 				displayName: 'Line Item',
 				values: [
 					{
+						displayName: 'Account Code Name or ID',
+						name: 'accountCode',
+						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+						default: '',
+					},
+					{
 						displayName: 'Description',
 						name: 'description',
 						type: 'string',
@@ -131,46 +144,39 @@ export const invoiceFields: INodeProperties[] = [
 						description: 'A line item with just a description',
 					},
 					{
-						displayName: 'Quantity',
-						name: 'quantity',
-						type: 'number',
-						default: 1,
-						typeOptions: {
-							minValue: 1,
-						},
-						description: 'LineItem Quantity',
-					},
-					{
-						displayName: 'Unit Amount',
-						name: 'unitAmount',
+						displayName: 'Discount Rate',
+						name: 'discountRate',
 						type: 'string',
 						default: '',
-						description:
-							'Lineitem unit amount. By default, unit amount will be rounded to two decimal places.',
+						description: 'Percentage discount or discount amount being applied to a line item. Only supported on ACCREC invoices	-	ACCPAY invoices and credit notes in Xero do not support discounts.',
 					},
 					{
 						displayName: 'Item Code Name or ID',
 						name: 'itemCode',
 						type: 'options',
-						description:
-							'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-						typeOptions: {
-							loadOptionsMethod: 'getItemCodes',
-							loadOptionsDependsOn: ['organizationId'],
-						},
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 						default: '',
 					},
 					{
-						displayName: 'Account Code Name or ID',
-						name: 'accountCode',
-						type: 'options',
-						description:
-							'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-						typeOptions: {
-							loadOptionsMethod: 'getAccountCodes',
-							loadOptionsDependsOn: ['organizationId'],
-						},
+						displayName: 'Line Amount',
+						name: 'lineAmount',
+						type: 'string',
 						default: '',
+						description: 'The line amount reflects the discounted price if a DiscountRate has been used',
+					},
+					{
+						displayName: 'Quantity',
+						name: 'quantity',
+						type: 'number',
+						default: 1,
+						description: 'LineItem Quantity',
+					},
+					{
+						displayName: 'Tax Amount',
+						name: 'taxAmount',
+						type: 'string',
+						default: '',
+						description: 'The tax amount is auto calculated as a percentage of the line amount based on the tax rate',
 					},
 					{
 						displayName: 'Tax Type',
@@ -194,79 +200,47 @@ export const invoiceFields: INodeProperties[] = [
 								value: 'GSTONIMPORTS',
 							},
 						],
-						default: '',
-						required: true,
+						default: 'INPUT',
+							required:	true,
 					},
 					{
-						displayName: 'Tax Amount',
-						name: 'taxAmount',
-						type: 'string',
-						default: '',
-						description:
-							'The tax amount is auto calculated as a percentage of the line amount based on the tax rate',
+						displayName: 'Tracking',
+						name: 'trackingUi',
+						placeholder: 'Add Tracking',
+						description: 'Any LineItem can have a maximum of 2 TrackingCategory elements',
+						type: 'fixedCollection',
+						default: {},
+						options: [
+							{
+								name: 'trackingValues',
+								displayName: 'Tracking',
+									values:	[
+											{
+												displayName: 'Name',
+												name: 'name',
+												type: 'string',
+												default: '',
+												description: 'Name of the tracking category',
+											},
+											{
+												displayName: 'Option',
+												name: 'option',
+												type: 'string',
+												default: '',
+												description: 'Name of the option',
+											},
+									]
+							},
+					]
 					},
 					{
-						displayName: 'Line Amount',
-						name: 'lineAmount',
+						displayName: 'Unit Amount',
+						name: 'unitAmount',
 						type: 'string',
 						default: '',
-						description:
-							'The line amount reflects the discounted price if a DiscountRate has been used',
+						description: 'Lineitem unit amount. By default, unit amount will be rounded to two decimal places.',
 					},
-					{
-						displayName: 'Discount Rate',
-						name: 'discountRate',
-						type: 'string',
-						default: '',
-						description:
-							'Percentage discount or discount amount being applied to a line item. Only supported on ACCREC invoices - ACCPAY invoices and credit notes in Xero do not support discounts.',
-					},
-					// {
-					// 	displayName: 'Tracking',
-					// 	name: 'trackingUi',
-					// 	placeholder: 'Add Tracking',
-					// 	description: 'Any LineItem can have a maximum of 2 TrackingCategory elements.',
-					// 	type: 'fixedCollection',
-					// 	typeOptions: {
-					// 		multipleValues: true,
-					// 	},
-					// 	default: {},
-					// 	options: [
-					// 		{
-					// 			name: 'trackingValues',
-					// 			displayName: 'Tracking',
-					// 			values: [
-					// 				{
-					// 					displayName: 'Name',
-					// 					name: 'name',
-					// 					type: 'options',
-					// 					typeOptions: {
-					// 						loadOptionsMethod: 'getTrakingCategories',
-					// 						loadOptionsDependsOn: [
-					// 							'organizationId',
-					// 						],
-					// 					},
-					// 					default: '',
-					// 					description: 'Name of the tracking category',
-					// 				},
-					// 				{
-					// 					displayName: 'Option',
-					// 					name: 'option',
-					// 					type: 'options',
-					// 					typeOptions: {
-					// 						loadOptionsMethod: 'getTrakingOptions',
-					// 						loadOptionsDependsOn: [
-					// 							'/name',
-					// 						],
-					// 					},
-					// 					default: '',
-					// 					description: 'Name of the option',
-					// 				},
-					// 			],
-					// 		},
-					// 	],
-					// },
-				],
+			],
 			},
 		],
 	},
@@ -569,66 +543,66 @@ export const invoiceFields: INodeProperties[] = [
 						displayName: 'Line Item',
 						values: [
 							{
-								displayName: 'Line Item ID',
-								name: 'lineItemId',
-								type: 'string',
-								default: '',
-								description: 'The Xero generated identifier for a LineItem',
+						displayName: 'Account Code Name or ID',
+						name: 'accountCode',
+						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+						default: '',
 							},
 							{
-								displayName: 'Description',
-								name: 'description',
-								type: 'string',
-								default: '',
-								description: 'A line item with just a description',
+						displayName: 'Description',
+						name: 'description',
+						type: 'string',
+						default: '',
+						description: 'A line item with just a description',
 							},
 							{
-								displayName: 'Quantity',
-								name: 'quantity',
-								type: 'number',
-								default: 1,
-								typeOptions: {
-									minValue: 1,
-								},
-								description: 'LineItem Quantity',
+						displayName: 'Discount Rate',
+						name: 'discountRate',
+						type: 'string',
+						default: '',
+						description: 'Percentage discount or discount amount being applied to a line item. Only supported on ACCREC invoices	-	ACCPAY invoices and credit notes in Xero do not support discounts.',
 							},
 							{
-								displayName: 'Unit Amount',
-								name: 'unitAmount',
-								type: 'string',
-								default: '',
-								description:
-									'Lineitem unit amount. By default, unit amount will be rounded to two decimal places.',
+						displayName: 'Item Code Name or ID',
+						name: 'itemCode',
+						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+						default: '',
 							},
 							{
-								displayName: 'Item Code Name or ID',
-								name: 'itemCode',
-								type: 'options',
-								description:
-									'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-								typeOptions: {
-									loadOptionsMethod: 'getItemCodes',
-									loadOptionsDependsOn: ['organizationId'],
-								},
-								default: '',
+						displayName: 'Line Amount',
+						name: 'lineAmount',
+						type: 'string',
+						default: '',
+						description: 'The line amount reflects the discounted price if a DiscountRate has been used',
 							},
 							{
-								displayName: 'Account Code Name or ID',
-								name: 'accountCode',
-								type: 'options',
-								description:
-									'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-								typeOptions: {
-									loadOptionsMethod: 'getAccountCodes',
-									loadOptionsDependsOn: ['organizationId'],
-								},
-								default: '',
+						displayName: 'Line Item ID',
+						name: 'lineItemId',
+						type: 'string',
+						default: '',
+						description: 'The Xero generated identifier for a LineItem',
 							},
 							{
-								displayName: 'Tax Type',
-								name: 'taxType',
-								type: 'options',
-								options: [
+						displayName: 'Quantity',
+						name: 'quantity',
+						type: 'number',
+						default: 1,
+						description: 'LineItem Quantity',
+							},
+							{
+						displayName: 'Tax Amount',
+						name: 'taxAmount',
+						type: 'string',
+						default: '',
+						description: 'The tax amount is auto calculated as a percentage of the line amount based on the tax rate',
+							},
+							{
+						displayName: 'Tax Type',
+						name: 'taxType',
+						type: 'options',
+						options: [
 									{
 										name: 'Tax on Purchases',
 										value: 'INPUT',
@@ -646,79 +620,17 @@ export const invoiceFields: INodeProperties[] = [
 										value: 'GSTONIMPORTS',
 									},
 								],
-								default: '',
-								required: true,
+						default: 'INPUT',
+							required:	true,
 							},
 							{
-								displayName: 'Tax Amount',
-								name: 'taxAmount',
-								type: 'string',
-								default: '',
-								description:
-									'The tax amount is auto calculated as a percentage of the line amount based on the tax rate',
+						displayName: 'Unit Amount',
+						name: 'unitAmount',
+						type: 'string',
+						default: '',
+						description: 'Lineitem unit amount. By default, unit amount will be rounded to two decimal places.',
 							},
-							{
-								displayName: 'Line Amount',
-								name: 'lineAmount',
-								type: 'string',
-								default: '',
-								description:
-									'The line amount reflects the discounted price if a DiscountRate has been used',
-							},
-							{
-								displayName: 'Discount Rate',
-								name: 'discountRate',
-								type: 'string',
-								default: '',
-								description:
-									'Percentage discount or discount amount being applied to a line item. Only supported on ACCREC invoices - ACCPAY invoices and credit notes in Xero do not support discounts.',
-							},
-							// {
-							// 	displayName: 'Tracking',
-							// 	name: 'trackingUi',
-							// 	placeholder: 'Add Tracking',
-							// 	description: 'Any LineItem can have a maximum of 2 TrackingCategory elements.',
-							// 	type: 'fixedCollection',
-							// 	typeOptions: {
-							// 		multipleValues: true,
-							// 	},
-							// 	default: {},
-							// 	options: [
-							// 		{
-							// 			name: 'trackingValues',
-							// 			displayName: 'Tracking',
-							// 			values: [
-							// 				{
-							// 					displayName: 'Name',
-							// 					name: 'name',
-							// 					type: 'options',
-							// 					typeOptions: {
-							// 						loadOptionsMethod: 'getTrakingCategories',
-							// 						loadOptionsDependsOn: [
-							// 							'organizationId',
-							// 						],
-							// 					},
-							// 					default: '',
-							// 					description: 'Name of the tracking category',
-							// 				},
-							// 				{
-							// 					displayName: 'Option',
-							// 					name: 'option',
-							// 					type: 'options',
-							// 					typeOptions: {
-							// 						loadOptionsMethod: 'getTrakingOptions',
-							// 						loadOptionsDependsOn: [
-							// 							'/name',
-							// 						],
-							// 					},
-							// 					default: '',
-							// 					description: 'Name of the option',
-							// 				},
-							// 			],
-							// 		},
-							// 	],
-							// },
-						],
+					],
 					},
 				],
 			},
@@ -882,12 +794,28 @@ export const invoiceFields: INodeProperties[] = [
 				description: "Whether you'll only retrieve Invoices created by your app",
 			},
 			{
+				displayName: 'Custom Where',
+				name: 'customWhere',
+				type: 'string',
+				placeholder: 'Status=="AUTHORISED" && Type=="ACCREC"',
+				default: '',
+				description: 'Advanced: Custom where clause. This will override the Where Filters above if provided. Examples: Status=="AUTHORISED", Contact.ContactID=guid("96988e67-ecf9-466d-bfbf-0afa1725a649"), Date>=DateTime(2024,01,01)',
+			},
+			{
 				displayName: 'Order By',
 				name: 'orderBy',
 				type: 'string',
 				placeholder: 'InvoiceID',
 				default: '',
 				description: 'Order by any element returned',
+			},
+			{
+				displayName: 'Search Term',
+				name: 'searchTerm',
+				type: 'string',
+				placeholder: '',
+				default: '',
+				description: 'Search parameter that performs a case-insensitive text search across the fields: InvoiceNumber, Reference',
 			},
 			{
 				displayName: 'Sort Order',
@@ -903,7 +831,7 @@ export const invoiceFields: INodeProperties[] = [
 						value: 'DESC',
 					},
 				],
-				default: '',
+				default: 'ASC',
 			},
 			{
 				displayName: 'Statuses',
@@ -924,6 +852,13 @@ export const invoiceFields: INodeProperties[] = [
 					},
 				],
 				default: [],
+			},
+			{
+				displayName: 'Summary Only', 
+				name: 'summaryOnly',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to return lightweight fields, excluding computation-heavy fields from the response, making the API calls quick and efficient',
 			},
             // Removed in favour of Where Filters and Custom Where
 			//{
@@ -951,264 +886,222 @@ export const invoiceFields: INodeProperties[] = [
 						displayName: 'Filter',
 						values: [
 							{
-								displayName: 'Field',
-								name: 'field',
-								type: 'options',
-								options: [
-									{ name: 'Status', value: 'Status' },
-									{ name: 'Contact ID', value: 'Contact.ContactID' },
-									{ name: 'Contact Name', value: 'Contact.Name' },
-									{ name: 'Contact Number', value: 'Contact.ContactNumber' },
-									{ name: 'Reference', value: 'Reference' },
-									{ name: 'Invoice Number', value: 'InvoiceNumber' },
-									{ name: 'Invoice ID', value: 'InvoiceId' },
-									{ name: 'Date Range', value: 'DateRange' },
-									{ name: 'Type', value: 'Type' },
-									{ name: 'Amount Due Range', value: 'AmountDueRange' },
-									{ name: 'Amount Paid Range', value: 'AmountPaidRange' },
-									{ name: 'Due Date Range', value: 'DueDateRange' },
+						displayName: 'Contact ID',
+						name: 'contactIdValue',
+						type: 'string',
+						default: '',
+						placeholder: '96988e67-ecf9-466d-bfbf-0afa1725a649',
+						description: 'Contact GUID',
+							},
+							{
+						displayName: 'Contact Name',
+						name: 'contactNameValue',
+						type: 'string',
+						default: '',
+						placeholder: 'ABC Limited',
+							},
+							{
+						displayName: 'Contact Number',
+						name: 'contactNumberValue',
+						type: 'string',
+						default: '',
+						placeholder: 'ID001',
+							},
+							{
+						displayName: 'Field',
+						name: 'field',
+						type: 'options',
+						options: [
+									{
+										name: 'Amount Due Range',
+										value: 'AmountDueRange',
+									},
+									{
+										name: 'Amount Paid Range',
+										value: 'AmountPaidRange',
+									},
+									{
+										name: 'Contact ID',
+										value: 'Contact.ContactID',
+									},
+									{
+										name: 'Contact Name',
+										value: 'Contact.Name',
+									},
+									{
+										name: 'Contact Number',
+										value: 'Contact.ContactNumber',
+									},
+									{
+										name: 'Date Range',
+										value: 'DateRange',
+									},
+									{
+										name: 'Due Date Range',
+										value: 'DueDateRange',
+									},
+									{
+										name: 'Invoice ID',
+										value: 'InvoiceId',
+									},
+									{
+										name: 'Invoice Number',
+										value: 'InvoiceNumber',
+									},
+									{
+										name: 'Reference',
+										value: 'Reference',
+									},
+									{
+										name: 'Status',
+										value: 'Status',
+									},
+									{
+										name: 'Type',
+										value: 'Type',
+									},
 								],
-								default: 'Status',
-								description: 'Field to filter on',
+						default: 'Status',
+						description: 'Field to filter on',
 							},
 							{
-								displayName: 'Status',
-								name: 'statusValue',
-								type: 'options',
-								options: [
-									{ name: 'Draft', value: 'DRAFT' },
-									{ name: 'Submitted', value: 'SUBMITTED' },
-									{ name: 'Authorised', value: 'AUTHORISED' },
-									{ name: 'Paid', value: 'PAID' },
-									{ name: 'Partially Paid', value: 'PARTIALLYPAID' },
-									{ name: 'Overpaid', value: 'OVERPAID' },
-									{ name: 'Voided', value: 'VOIDED' },
-									{ name: 'Deleted', value: 'DELETED' },
-								],
-								default: 'AUTHORISED',
-								displayOptions: {
-									show: {
-										field: ['Status'],
-									},
-								},
+						displayName: 'From Date',
+						name: 'dateFromValue',
+						type: 'dateTime',
+						default: '',
+						description: 'Start date for range (leave empty for no minimum)',
 							},
 							{
-								displayName: 'Contact ID',
-								name: 'contactIdValue',
-								type: 'string',
-								default: '',
-								placeholder: '96988e67-ecf9-466d-bfbf-0afa1725a649',
-								description: 'Contact GUID',
-								displayOptions: {
-									show: {
-										field: ['Contact.ContactID'],
-									},
-								},
+						displayName: 'From Due Date',
+						name: 'dueDateFromValue',
+						type: 'dateTime',
+						default: '',
+						description: 'Start due date for range (leave empty for no minimum)',
 							},
 							{
-								displayName: 'Contact Name',
-								name: 'contactNameValue',
-								type: 'string',
-								default: '',
-								placeholder: 'ABC Limited',
-								description: 'Contact name',
-								displayOptions: {
-									show: {
-										field: ['Contact.Name'],
-									},
-								},
+						displayName: 'Invoice ID',
+						name: 'invoiceIdValue',
+						type: 'string',
+						default: '',
+						placeholder: '220ddca8-3144-4085-9a88-2d72c5133734',
+						description: 'Invoice GUID',
 							},
 							{
-								displayName: 'Contact Number',
-								name: 'contactNumberValue',
-								type: 'string',
-								default: '',
-								placeholder: 'ID001',
-								description: 'Contact number',
-								displayOptions: {
-									show: {
-										field: ['Contact.ContactNumber'],
-									},
-								},
+						displayName: 'Invoice Number',
+						name: 'invoiceNumberValue',
+						type: 'string',
+						default: '',
+						placeholder: 'INV-001',
 							},
 							{
-								displayName: 'Reference',
-								name: 'referenceValue',
-								type: 'string',
-								default: '',
-								placeholder: 'REF12',
-								description: 'Invoice reference',
-								displayOptions: {
-									show: {
-										field: ['Reference'],
-									},
-								},
+						displayName: 'Maximum Amount Due',
+						name: 'amountDueMaxValue',
+						type: 'number',
+						default: '',
+						description: 'Maximum amount due (leave empty for no maximum)',
 							},
 							{
-								displayName: 'Invoice Number',
-								name: 'invoiceNumberValue',
-								type: 'string',
-								default: '',
-								placeholder: 'INV-001',
-								description: 'Invoice number',
-								displayOptions: {
-									show: {
-										field: ['InvoiceNumber'],
-									},
-								},
+						displayName: 'Maximum Amount Paid',
+						name: 'amountPaidMaxValue',
+						type: 'number',
+						default: '',
+						description: 'Maximum amount paid (leave empty for no maximum)',
 							},
 							{
-								displayName: 'Invoice ID',
-								name: 'invoiceIdValue',
-								type: 'string',
-								default: '',
-								placeholder: '220ddca8-3144-4085-9a88-2d72c5133734',
-								description: 'Invoice GUID',
-								displayOptions: {
-									show: {
-										field: ['InvoiceId'],
-									},
-								},
+						displayName: 'Minimum Amount Due',
+						name: 'amountDueMinValue',
+						type: 'number',
+						default: '',
+						description: 'Minimum amount due (leave empty for no minimum)',
 							},
 							{
-								displayName: 'From Date',
-								name: 'dateFromValue',
-								type: 'dateTime',
-								default: '',
-								description: 'Start date for range (leave empty for no minimum)',
-								displayOptions: {
-									show: {
-										field: ['DateRange'],
-									},
-								},
+						displayName: 'Minimum Amount Paid',
+						name: 'amountPaidMinValue',
+						type: 'number',
+						default: '',
+						description: 'Minimum amount paid (leave empty for no minimum)',
 							},
 							{
-								displayName: 'To Date',
-								name: 'dateToValue',
-								type: 'dateTime',
-								default: '',
-								description: 'End date for range (leave empty for no maximum)',
-								displayOptions: {
-									show: {
-										field: ['DateRange'],
-									},
-								},
+						displayName: 'Reference',
+						name: 'referenceValue',
+						type: 'string',
+						default: '',
+						placeholder: 'REF12',
+						description: 'Invoice reference',
 							},
 							{
-								displayName: 'Type',
-								name: 'typeValue',
-								type: 'options',
-								options: [
-									{ name: 'Sales Invoice', value: 'ACCREC' },
-									{ name: 'Bill', value: 'ACCPAY' },
-								],
-								default: 'ACCREC',
-								displayOptions: {
-									show: {
-										field: ['Type'],
+						displayName: 'Status',
+						name: 'statusValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Authorised',
+										value: 'AUTHORISED',
 									},
-								},
+									{
+										name: 'Deleted',
+										value: 'DELETED',
+									},
+									{
+										name: 'Draft',
+										value: 'DRAFT',
+									},
+									{
+										name: 'Overpaid',
+										value: 'OVERPAID',
+									},
+									{
+										name: 'Paid',
+										value: 'PAID',
+									},
+									{
+										name: 'Partially Paid',
+										value: 'PARTIALLYPAID',
+									},
+									{
+										name: 'Submitted',
+										value: 'SUBMITTED',
+									},
+									{
+										name: 'Voided',
+										value: 'VOIDED',
+									},
+					],
+						default: 'AUTHORISED',
 							},
 							{
-								displayName: 'Minimum Amount Due',
-								name: 'amountDueMinValue',
-								type: 'number',
-								default: '',
-								description: 'Minimum amount due (leave empty for no minimum)',
-								displayOptions: {
-									show: {
-										field: ['AmountDueRange'],
-									},
-								},
+						displayName: 'To Date',
+						name: 'dateToValue',
+						type: 'dateTime',
+						default: '',
+						description: 'End date for range (leave empty for no maximum)',
 							},
 							{
-								displayName: 'Maximum Amount Due',
-								name: 'amountDueMaxValue',
-								type: 'number',
-								default: '',
-								description: 'Maximum amount due (leave empty for no maximum)',
-								displayOptions: {
-									show: {
-										field: ['AmountDueRange'],
-									},
-								},
+						displayName: 'To Due Date',
+						name: 'dueDateToValue',
+						type: 'dateTime',
+						default: '',
+						description: 'End due date for range (leave empty for no maximum)',
 							},
 							{
-								displayName: 'Minimum Amount Paid',
-								name: 'amountPaidMinValue',
-								type: 'number',
-								default: '',
-								description: 'Minimum amount paid (leave empty for no minimum)',
-								displayOptions: {
-									show: {
-										field: ['AmountPaidRange'],
+						displayName: 'Type',
+						name: 'typeValue',
+						type: 'options',
+						options: [
+									{
+										name: 'Sales Invoice',
+										value: 'ACCREC',
 									},
-								},
-							},
-							{
-								displayName: 'Maximum Amount Paid',
-								name: 'amountPaidMaxValue',
-								type: 'number',
-								default: '',
-								description: 'Maximum amount paid (leave empty for no maximum)',
-								displayOptions: {
-									show: {
-										field: ['AmountPaidRange'],
+									{
+										name: 'Bill',
+										value: 'ACCPAY',
 									},
-								},
+					],
+						default: 'ACCREC',
 							},
-							{
-								displayName: 'From Due Date',
-								name: 'dueDateFromValue',
-								type: 'dateTime',
-								default: '',
-								description: 'Start due date for range (leave empty for no minimum)',
-								displayOptions: {
-									show: {
-										field: ['DueDateRange'],
-									},
-								},
-							},
-							{
-								displayName: 'To Due Date',
-								name: 'dueDateToValue',
-								type: 'dateTime',
-								default: '',
-								description: 'End due date for range (leave empty for no maximum)',
-								displayOptions: {
-									show: {
-										field: ['DueDateRange'],
-									},
-								},
-							},
-						],
+					],
 					},
 				],
-			},
-			{
-				displayName: 'Custom Where',
-				name: 'customWhere',
-				type: 'string',
-				placeholder: 'Status=="AUTHORISED" && Type=="ACCREC"',
-				default: '',
-				description: 'Advanced: Custom where clause. This will override the Where Filters above if provided. Examples: Status=="AUTHORISED", Contact.ContactID=guid("96988e67-ecf9-466d-bfbf-0afa1725a649"), Date>=DateTime(2024,01,01)',
-			},
-			{
-				displayName: 'Summary Only', 
-				name: 'summaryOnly',
-				type: 'boolean',
-				default: false,
-				description:
-					'When set to true, this returns lightweight fields, excluding computation-heavy fields from the response, making the API calls quick and efficient.',
-			},
-			{
-				displayName: 'Search Term',
-				name: 'searchTerm',
-				type: 'string',
-				placeholder: '',
-				default: '',
-				description:
-					'	Search parameter that performs a case-insensitive text search across the fields: InvoiceNumber, Reference.',
 			},
 		],
 	},

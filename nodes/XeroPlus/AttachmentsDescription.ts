@@ -113,7 +113,7 @@ export const attachmentsFields: INodeProperties[] = [
 		name: 'guid',
 		type: 'string',
 		default: '',
-		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.).',
+		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.)',
 		displayOptions: {
 			show: {
 				resource: ['attachments'],
@@ -127,7 +127,7 @@ export const attachmentsFields: INodeProperties[] = [
 		name: 'binaryPropertyName',
 		type: 'string',
 		default: 'data',
-		description: 'Name of the binary property that contains the file data to upload.',
+		description: 'Name of the binary property that contains the file data to upload',
 		displayOptions: {
 			show: {
 				resource: ['attachments'],
@@ -203,7 +203,7 @@ export const attachmentsFields: INodeProperties[] = [
 		name: 'guid',
 		type: 'string',
 		default: '',
-		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.).',
+		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.)',
 		displayOptions: {
 			show: {
 				resource: ['attachments'],
@@ -266,7 +266,7 @@ export const attachmentsFields: INodeProperties[] = [
 		name: 'guid',
 		type: 'string',
 		default: '',
-		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.).',
+		description: 'The ID of the transaction that the attachment belongs to (e.g. InvoiceID, BankTransactionID, etc.)',
 		displayOptions: {
 			show: {
 				resource: ['attachments'],
@@ -280,7 +280,7 @@ export const attachmentsFields: INodeProperties[] = [
 		name: 'filename',
 		type: 'string',
 		default: '',
-		description: 'The name of the attachment to get.',
+		description: 'The name of the attachment to get',
 		displayOptions: {
 			show: {
 				resource: ['attachments'],
