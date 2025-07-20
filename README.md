@@ -1,6 +1,6 @@
 # n8n-nodes-xero-extended
 
-[![npm version](https://badge.fury.io/js/n8n-nodes-xero-extended.svg)](https://badge.fury.io/js/n8n-nodes-xero-extended)
+[![npm version](https://badge.fury.io/js/n8n-nodes-xero-extended.svg?icon=si%3Anpm)](https://badge.fury.io/js/n8n-nodes-xero-extended)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An enhanced Xero integration for n8n that extends the standard Xero node with additional resources and improved functionality.
@@ -174,7 +174,7 @@ To install a custom node in n8n, follow these steps:
 
 - Refer to the official documentation: n8n Custom Node Installation (https://docs.n8n.io/integrations/community-nodes/installation/)
 
-- Choose the custom node you want to install, for example, n8n-nodes-xero-plus
+- Choose the custom node you want to install, for example, n8n-nodes-xero-extended
 
 - Follow the instructions provided in the documentation to install and configure the custom node.
 
