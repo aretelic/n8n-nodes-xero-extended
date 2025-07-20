@@ -1,13 +1,13 @@
-# n8n-nodes-xero-plus
+# n8n-nodes-xero-extended
 
-[![npm version](https://badge.fury.io/js/n8n-nodes-xero-plus.svg)](https://badge.fury.io/js/n8n-nodes-xero-plus)
+[![npm version](https://badge.fury.io/js/n8n-nodes-xero-extended.svg)](https://badge.fury.io/js/n8n-nodes-xero-extended)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An enhanced Xero integration for n8n that extends the standard Xero node with additional resources and improved functionality.
 
-Xero Plus is an enhanced Xero integration that extends the standard Xero node with additional resources and improved functionality, including enhanced search capabilities, summary modes, and quality-of-life improvements.
+Xero Extended is an enhanced Xero integration that extends the standard Xero node with additional resources and improved functionality, including enhanced search capabilities, summary modes, and quality-of-life improvements.
 
-![Xero Plus Action Comparison](Screenshot_Xero_action_comparison.png)
+![Xero Extended Action Comparison](Screenshot_Xero_action_comparison.png)
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
