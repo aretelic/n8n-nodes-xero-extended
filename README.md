@@ -11,12 +11,14 @@ Xero Extended is an enhanced Xero integration that extends the standard Xero nod
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-[Installation](#installation)  
-[Operations](#operations)  
-[Credentials](#credentials)  
-[Compatibility](#compatibility)  
-[Resources](#resources)  
-[Support](#support)  
+- [Installation](#installation)
+- [Operations](#operations)
+- [Credentials](#credentials)
+- [Compatibility](#compatibility)
+- [Resources](#resources)
+- [Setup after installation](#setup-after-installation)
+- [License](#license)
+- [Support](#support)  
 
 ## Installation
 
@@ -173,17 +175,14 @@ This node is currently only available via installation on self-hosted instances.
 To install a custom node in n8n, follow these steps:
 
 - Refer to the official documentation: n8n Custom Node Installation (https://docs.n8n.io/integrations/community-nodes/installation/)
+- Choose the custom node you want to install, on the install community nodes box you'll enter the npm package name for the node. For example, n8n-nodes-xero-extended
+- Once installed you will now need to setup the credentials for the node. See below for more info.
 
-- Choose the custom node you want to install, for example, n8n-nodes-xero-extended
-
-- Follow the instructions provided in the documentation to install and configure the custom node.
-
-- For detailed installation steps and configuration options, please visit the official n8n documentation linked above.
 
 ## Setup after installation
 
 Similar to base Xero node:
-1. Create a new Xero OAuth2 credential (you can't use the base Xero node as additional scopes are requested and needed for this node)
+1. Once installed you will set up the credentials in the same way done for the Xero base node. (you can't use the base Xero node as additional scopes are requested and needed for this node)
 2. Select the resource/organisations you want to work with or accept all
 
 
@@ -201,7 +200,7 @@ Now the following are requested in addition: 	'accounting.attachments',	'account
 
 ## Support
 
-For support, please open an issue on the [GitHub repository](https://github.com/Mad-Man-Dan/n8n-nodes-xero-plus).
+For support, please open an issue on the [GitHub repository](https://github.com/Mad-Man-Dan/n8n-nodes-xero-extended).
 
 ## Author
 
