@@ -41,6 +41,8 @@ This node provides enhanced functionality for Xero integration, including additi
 - **Manual Journals**: Create, Get, Get Many
 - **History and Notes**: Create Note, Get History
 
+Users can also benefit from the increased scopes to perform custom API calls with expanded actions.
+
 ## Credentials
 
 This node uses Xero OAuth2 credentials that are separate from the standard Xero node. The credentials request additional scopes not included in the original Xero base node.

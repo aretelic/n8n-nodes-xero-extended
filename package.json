@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Mad-Man-Dan/n8n-nodes-xero-plus.git"
+    "url": "git+https://github.com/Mad-Man-Dan/n8n-nodes-xero-plus.git"
   },
   "engines": {
     "node": ">=20.15"
