@@ -79,105 +79,54 @@ Complete bank transaction management:
 
 - **Create Bank Transaction** - Create new bank transactions
 - **Get Bank Transactions** - Retrieve transaction history
-- **Update Bank Transaction** - Modify existing transactions
-- **Delete Bank Transaction** - Remove transactions
+- **Get Many Transactions** - Retrieve multiple transactions with filtering
+
 
 ### 💸 Bank Transfers
 Manage bank transfers between accounts:
 
 - **Create Bank Transfer** - Create transfers between bank accounts
 - **Get Bank Transfers** - Retrieve transfer history
-- **Update Bank Transfer** - Modify existing transfers
-- **Delete Bank Transfer** - Remove transfers
+- **Get Many Transactions** - Retrieve multiple tratransfers with filtering
 
 ### 📝 History and Notes
 Track changes and manage notes:
 
-- **Get History** - Retrieve transaction history
-- **Get Notes** - Access notes for transactions
 - **Create Note** - Add new notes
-- **Update Note** - Modify existing notes
-- **Delete Note** - Remove notes
+- **Get History** - Retrieve transaction history
 
 ## Installation
 
 ### For n8n Cloud users
 
-This node is available on n8n Cloud. You can find it in the node library under "Xero +".
+This node is currently only available via installation on self-hosted instances. I will push to n8n-cloud via pull requests down the line to the base Xero node. However, so many changes and revisions have been done that the process would be time consuming for individual pull requests for the team to approve. I'll try to get to this some time in following month once I see about more additions.
 
 ### For self-hosted n8n users
 
-1. Install the package in your n8n installation:
-   ```bash
-   npm install n8n-nodes-xero-plus
-   ```
+To install a custom node in n8n, follow these steps:
 
-2. Restart your n8n instance
+- Refer to the official documentation: n8n Custom Node Installation (https://docs.n8n.io/integrations/community-nodes/installation/)
 
-3. The "Xero +" node will now be available in your node library
+- Choose the custom node you want to install, for example, n8n-nodes-xero-plus
 
-## Setup
+- Follow the instructions provided in the documentation to install and configure the custom node.
 
-1. Add the "Xero +" node to your workflow
-2. Create a new Xero OAuth2 credential or use an existing one
-3. Select the resource you want to work with
-4. Configure the operation and parameters as needed
+- For detailed installation steps and configuration options, please visit the official n8n documentation linked above.
+
+## Setup after installation
+
+Similar to base Xero node:
+1. Create a new Xero OAuth2 credential (you can't use the base Xero node as additional scopes are requested and needed for this node)
+2. Select the resource/organisations you want to work with or accept all
+
 
 ## Credentials
 
-This node uses the same Xero OAuth2 credentials as the standard Xero node. You can use your existing Xero credentials or create new ones following the [Xero API documentation](https://developer.xero.com/app/).
+This node uses a separate set of Xero OAuth2 credentials from the standard Xero node. The credentials created will also request additional scopes not in the original Xero base node. The scopes requested are as follows:
 
-## Usage Examples
+Previously the only scopes requested were: 	'offline_access', 'accounting.transactions', 'accounting.settings',	'accounting.contacts'
 
-### Get Contacts with Search
-Use the enhanced search functionality to find contacts by name, email, or other fields:
-
-```javascript
-// Search for contacts containing "john" in any searchable field
-{
-  "resource": "contact",
-  "operation": "getMany",
-  "search": "john"
-}
-```
-
-### Get Invoices with Summary
-Retrieve lightweight invoice data for faster processing:
-
-```javascript
-// Get invoice summary only
-{
-  "resource": "invoice",
-  "operation": "get",
-  "summaryOnly": true
-}
-```
-
-### Upload Attachment to Invoice
-Attach files to any transaction type:
-
-```javascript
-// Upload a file to an invoice
-{
-  "resource": "attachments",
-  "operation": "upload",
-  "transactionType": "Invoice",
-  "transactionId": "{{$json.InvoiceID}}",
-  "fileName": "receipt.pdf",
-  "fileData": "{{$binary.data}}"
-}
-```
-
-## Version History
-
-### v1.0.1
-- Enhanced Contacts and Invoices with summary options and search functionality
-- Added comprehensive Organisations, Attachments, Accounts, Reports, Bank Transactions, Bank Transfers, and History and Notes resources
-- Improved user experience with dropdown selections and enhanced filtering
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Now the following are requested in addition: 	'accounting.attachments',	'accounting.budgets.read',	'files',	'accounting.reports.read',
 
 ## License
 
@@ -193,4 +142,4 @@ For support, please open an issue on the [GitHub repository](https://github.com/
 
 ---
 
-Built with ❤️ for the n8n community
+Built for the n8n community and shout out to AutomationTown
