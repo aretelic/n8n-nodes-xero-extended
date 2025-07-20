@@ -13,3 +13,4 @@ npm-debug.log*
 yarn.lock
 deploy-node.bat
 .mdc
+docker-compose.yml
