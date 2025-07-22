@@ -13,7 +13,6 @@ import {
 } from 'n8n-workflow';
 
 import { contactFields, contactOperations } from './ContactDescription';
-import { Buffer } from 'buffer';
 import { xeroApiRequest, xeroApiRequestAllItems, transformReport } from './GenericFunctions';
 import type { IAddress, IContact, IPhone } from './IContactInterface';
 import { invoiceFields, invoiceOperations } from './InvoiceDescription';
