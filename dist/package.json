@@ -42,7 +42,7 @@
             "dist/credentials/XeroPlusOAuth2Api.credentials.js"
         ],
         "nodes": [
-            "dist/nodes/XeroPlus/Xeroplus.node.js"
+            "dist/nodes/Xeroplus/Xeroplus.node.js"
         ]
     },
     "devDependencies": {
